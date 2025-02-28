@@ -2,35 +2,44 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: authentication-service
-  description: Handles authentication and authorization for payment-related operations.
+  description: Authentication service for secure payments, supporting OAuth, JWT, and multi-factor authentication.
   annotations:
     github.com/project-slug: my-org/authentication-service
+    backstage.io/kubernetes-label-selector: "app=authentication-service"
+    backstage.io/techdocs-ref: dir:.
   tags:
     - authentication
     - payments
     - security
+    - grpc
+    - rabbitmq
+    - async
 spec:
   type: service
   owner: payments-team
   lifecycle: production
   providesApis:
     - authentication-api
+    - authentication-grpc
   consumesApis:
-    - payment-gateway-api
+    - api-gateway
     - transaction-api
     - user-account-api
     - fraud-detection-api
+    - notification-api
   dependsOn:
-    - component:payment-gateway
-    - component:transaction-service
+    - component:api-gateway
     - component:user-account-service
+    - component:transaction-service
     - component:fraud-detection-service
+    - resource:rabbitmq
+
 ---
 apiVersion: backstage.io/v1alpha1
 kind: API
 metadata:
   name: authentication-api
-  description: API for authentication and authorization in the payment system.
+  description: REST API for authentication service
 spec:
   type: openapi
   lifecycle: production
@@ -39,69 +48,178 @@ spec:
     openapi: 3.0.0
     info:
       title: Authentication API
-      version: 1.0.0
+      version: 2.0.0
     paths:
       /login:
         post:
-          summary: Authenticate a user and return a token
+          summary: Authenticate user and return JWT
           responses:
-            '200':
-              description: Authentication successful
-            '401':
-              description: Invalid credentials
+            '200': { description: "Success" }
+            '401': { description: "Unauthorized" }
       /validate:
         post:
-          summary: Validate authentication token
+          summary: Validate JWT token
           responses:
-            '200':
-              description: Token valid
-            '401':
-              description: Token invalid or expired
+            '200': { description: "Valid Token" }
+            '401': { description: "Invalid Token" }
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: authentication-grpc
+  description: gRPC authentication service for internal microservices communication
+spec:
+  type: grpc
+  lifecycle: production
+  owner: payments-team
+  definition: |
+    syntax = "proto3";
+    package auth;
+
+    service AuthService {
+      rpc Login (LoginRequest) returns (LoginResponse);
+      rpc ValidateToken (TokenRequest) returns (TokenResponse);
+    }
+
+    message LoginRequest { string username = 1; string password = 2; }
+    message LoginResponse { string token = 1; }
+    message TokenRequest { string token = 1; }
+    message TokenResponse { bool valid = 1; }
+
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: payment-gateway
-  description: Processes payments and integrates with external payment providers.
+  name: api-gateway
+  description: API Gateway for routing external and internal service calls.
+  tags:
+    - gateway
+    - reverse-proxy
 spec:
   type: service
-  owner: payments-team
+  owner: platform-team
   lifecycle: production
   providesApis:
-    - payment-gateway-api
+    - api-gateway
+  dependsOn:
+    - component:authentication-service
+    - component:frontend
+    - component:transaction-service
+    - component:user-account-service
+    - component:fraud-detection-service
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: frontend
+  description: Web frontend for authentication and payments.
+  annotations:
+    github.com/project-slug: my-org/frontend
+  tags:
+    - frontend
+    - react
+    - ui
+spec:
+  type: website
+  owner: frontend-team
+  lifecycle: production
+  dependsOn:
+    - component:authentication-service
+    - component:api-gateway
+
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: transaction-service
-  description: Manages transaction records, logs, and history.
+  description: Manages payment transactions and history.
 spec:
   type: service
   owner: payments-team
   lifecycle: production
   providesApis:
     - transaction-api
+  dependsOn:
+    - resource:postgres
+    - resource:rabbitmq
+
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: user-account-service
-  description: Stores user payment credentials and settings.
+  description: Manages user accounts and payment credentials.
 spec:
   type: service
-  owner: payments-team
+  owner: identity-team
   lifecycle: production
   providesApis:
     - user-account-api
+  dependsOn:
+    - resource:postgres
+
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: fraud-detection-service
-  description: Monitors transactions for potential fraud.
+  description: Uses AI/ML models to detect fraud in transactions.
 spec:
   type: service
   owner: security-team
   lifecycle: production
   providesApis:
     - fraud-detection-api
+  dependsOn:
+    - resource:rabbitmq
+    - resource:ml-engine
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: notification-service
+  description: Sends email/SMS notifications for authentication and transactions.
+spec:
+  type: service
+  owner: platform-team
+  lifecycle: production
+  providesApis:
+    - notification-api
+  dependsOn:
+    - resource:rabbitmq
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: rabbitmq
+  description: RabbitMQ message broker for async communication.
+spec:
+  type: queue
+  owner: infra-team
+  lifecycle: production
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: postgres
+  description: PostgreSQL database for user accounts and transactions.
+spec:
+  type: database
+  owner: infra-team
+  lifecycle: production
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: ml-engine
+  description: Machine learning engine for fraud detection.
+spec:
+  type: ml-model
+  owner: security-team
+  lifecycle: production
