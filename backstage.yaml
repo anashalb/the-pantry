@@ -28,6 +28,7 @@ spec:
     - fraud-detection-api
     - notification-api
   dependsOn:
+    - component:api-gateway
     - component:user-account-service
     - component:transaction-service
     - component:fraud-detection-service
@@ -35,10 +36,66 @@ spec:
 
 ---
 apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: authentication-api
+  description: REST API for authentication service
+spec:
+  type: openapi
+  lifecycle: production
+  owner: payments-team
+  definition: |
+    openapi: 3.0.0
+    info:
+      title: Authentication API
+      version: 2.0.0
+    paths:
+      /login:
+        post:
+          summary: Authenticate user and return JWT
+          responses:
+            '200': { description: "Success" }
+            '401': { description: "Unauthorized" }
+      /validate:
+        post:
+          summary: Validate JWT token
+          responses:
+            '200': { description: "Valid Token" }
+            '401': { description: "Invalid Token" }
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: authentication-grpc
+  description: gRPC authentication service for internal microservices communication
+spec:
+  type: grpc
+  lifecycle: production
+  owner: payments-team
+  definition: |
+    syntax = "proto3";
+    package auth;
+
+    service AuthService {
+      rpc Login (LoginRequest) returns (LoginResponse);
+      rpc ValidateToken (TokenRequest) returns (TokenResponse);
+    }
+
+    message LoginRequest { string username = 1; string password = 2; }
+    message LoginResponse { string token = 1; }
+    message TokenRequest { string token = 1; }
+    message TokenResponse { bool valid = 1; }
+
+---
+apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: api-gateway
   description: API Gateway for routing external and internal service calls.
+  tags:
+    - gateway
+    - reverse-proxy
 spec:
   type: service
   owner: platform-team
@@ -46,8 +103,8 @@ spec:
   providesApis:
     - api-gateway
   dependsOn:
-    - component:frontend
     - component:authentication-service
+    - component:frontend
     - component:transaction-service
     - component:user-account-service
     - component:fraud-detection-service
@@ -58,11 +115,18 @@ kind: Component
 metadata:
   name: frontend
   description: Web frontend for authentication and payments.
+  annotations:
+    github.com/project-slug: my-org/frontend
+  tags:
+    - frontend
+    - react
+    - ui
 spec:
   type: website
   owner: frontend-team
   lifecycle: production
   dependsOn:
+    - component:authentication-service
     - component:api-gateway
 
 ---
@@ -140,8 +204,6 @@ spec:
   type: service
   owner: platform-team
   lifecycle: production
-  providesApis:
-    - email-api
   dependsOn:
     - component:email-queue
 
@@ -155,8 +217,6 @@ spec:
   type: service
   owner: platform-team
   lifecycle: production
-  providesApis:
-    - sms-api
   dependsOn:
     - component:sms-gateway
 
@@ -170,8 +230,6 @@ spec:
   type: service
   owner: platform-team
   lifecycle: production
-  providesApis:
-    - push-api
   dependsOn:
     - component:push-dispatcher
 
@@ -198,8 +256,6 @@ spec:
   type: service
   owner: infra-team
   lifecycle: production
-  providesApis:
-    - sms-gateway-api
   dependsOn:
     - component:sms-analytics
 
@@ -213,8 +269,6 @@ spec:
   type: service
   owner: infra-team
   lifecycle: production
-  providesApis:
-    - push-dispatcher-api
   dependsOn:
     - component:push-analytics
 
@@ -228,8 +282,6 @@ spec:
   type: service
   owner: analytics-team
   lifecycle: production
-  providesApis:
-    - email-logging-api
 
 ---
 apiVersion: backstage.io/v1alpha1
@@ -241,8 +293,6 @@ spec:
   type: service
   owner: analytics-team
   lifecycle: production
-  providesApis:
-    - sms-analytics-api
 
 ---
 apiVersion: backstage.io/v1alpha1
@@ -254,8 +304,6 @@ spec:
   type: service
   owner: analytics-team
   lifecycle: production
-  providesApis:
-    - push-analytics-api
 
 ---
 apiVersion: backstage.io/v1alpha1
