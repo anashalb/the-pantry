@@ -180,8 +180,45 @@ spec:
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
+  name: authentication-service
+  description: Authentication service for secure payments, supporting OAuth, JWT, and multi-factor authentication.
+  annotations:
+    github.com/project-slug: my-org/authentication-service
+    backstage.io/kubernetes-label-selector: "app=authentication-service"
+    backstage.io/techdocs-ref: dir:.
+  tags:
+    - authentication
+    - payments
+    - security
+    - grpc
+    - rabbitmq
+    - async
+spec:
+  type: service
+  owner: payments-team
+  lifecycle: production
+  providesApis:
+    - authentication-api
+    - authentication-grpc
+  consumesApis:
+    - api-gateway
+    - transaction-api
+    - user-account-api
+    - fraud-detection-api
+    - notification-api
+  dependsOn:
+    - component:api-gateway
+    - component:user-account-service
+    - component:transaction-service
+    - component:fraud-detection-service
+    - resource:rabbitmq
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
   name: notification-service
-  description: Sends email/SMS notifications for authentication and transactions.
+  description: Sends email, SMS, and push notifications for authentication and transactions.
 spec:
   type: service
   owner: platform-team
@@ -189,7 +226,121 @@ spec:
   providesApis:
     - notification-api
   dependsOn:
+    - component:email-service
+    - component:sms-service
+    - component:push-service
     - resource:rabbitmq
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: email-service
+  description: Handles email notifications.
+spec:
+  type: service
+  owner: platform-team
+  lifecycle: production
+  dependsOn:
+    - component:email-queue
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: sms-service
+  description: Handles SMS notifications.
+spec:
+  type: service
+  owner: platform-team
+  lifecycle: production
+  dependsOn:
+    - component:sms-gateway
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: push-service
+  description: Handles push notifications.
+spec:
+  type: service
+  owner: platform-team
+  lifecycle: production
+  dependsOn:
+    - component:push-dispatcher
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: email-queue
+  description: Queue for processing email notifications.
+spec:
+  type: queue
+  owner: infra-team
+  lifecycle: production
+  dependsOn:
+    - component:email-logging
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: sms-gateway
+  description: Gateway for sending SMS notifications.
+spec:
+  type: service
+  owner: infra-team
+  lifecycle: production
+  dependsOn:
+    - component:sms-analytics
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: push-dispatcher
+  description: Dispatcher for push notifications.
+spec:
+  type: service
+  owner: infra-team
+  lifecycle: production
+  dependsOn:
+    - component:push-analytics
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: email-logging
+  description: Logs all outgoing emails for tracking.
+spec:
+  type: service
+  owner: analytics-team
+  lifecycle: production
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: sms-analytics
+  description: Analyzes SMS performance and delivery rates.
+spec:
+  type: service
+  owner: analytics-team
+  lifecycle: production
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: push-analytics
+  description: Analyzes push notification engagement and performance.
+spec:
+  type: service
+  owner: analytics-team
+  lifecycle: production
 
 ---
 apiVersion: backstage.io/v1alpha1
