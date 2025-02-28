@@ -180,43 +180,6 @@ spec:
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: authentication-service
-  description: Authentication service for secure payments, supporting OAuth, JWT, and multi-factor authentication.
-  annotations:
-    github.com/project-slug: my-org/authentication-service
-    backstage.io/kubernetes-label-selector: "app=authentication-service"
-    backstage.io/techdocs-ref: dir:.
-  tags:
-    - authentication
-    - payments
-    - security
-    - grpc
-    - rabbitmq
-    - async
-spec:
-  type: service
-  owner: payments-team
-  lifecycle: production
-  providesApis:
-    - authentication-api
-    - authentication-grpc
-  consumesApis:
-    - api-gateway
-    - transaction-api
-    - user-account-api
-    - fraud-detection-api
-    - notification-api
-  dependsOn:
-    - component:api-gateway
-    - component:user-account-service
-    - component:transaction-service
-    - component:fraud-detection-service
-    - resource:rabbitmq
-
----
-apiVersion: backstage.io/v1alpha1
-kind: Component
-metadata:
   name: notification-service
   description: Sends email, SMS, and push notifications for authentication and transactions.
 spec:
