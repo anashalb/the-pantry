@@ -1,0 +1,107 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: authentication-service
+  description: Handles authentication and authorization for payment-related operations.
+  annotations:
+    github.com/project-slug: my-org/authentication-service
+  tags:
+    - authentication
+    - payments
+    - security
+spec:
+  type: service
+  owner: payments-team
+  lifecycle: production
+  providesApis:
+    - authentication-api
+  consumesApis:
+    - payment-gateway-api
+    - transaction-api
+    - user-account-api
+    - fraud-detection-api
+  dependsOn:
+    - component:payment-gateway
+    - component:transaction-service
+    - component:user-account-service
+    - component:fraud-detection-service
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: authentication-api
+  description: API for authentication and authorization in the payment system.
+spec:
+  type: openapi
+  lifecycle: production
+  owner: payments-team
+  definition: |
+    openapi: 3.0.0
+    info:
+      title: Authentication API
+      version: 1.0.0
+    paths:
+      /login:
+        post:
+          summary: Authenticate a user and return a token
+          responses:
+            '200':
+              description: Authentication successful
+            '401':
+              description: Invalid credentials
+      /validate:
+        post:
+          summary: Validate authentication token
+          responses:
+            '200':
+              description: Token valid
+            '401':
+              description: Token invalid or expired
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: payment-gateway
+  description: Processes payments and integrates with external payment providers.
+spec:
+  type: service
+  owner: payments-team
+  lifecycle: production
+  providesApis:
+    - payment-gateway-api
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: transaction-service
+  description: Manages transaction records, logs, and history.
+spec:
+  type: service
+  owner: payments-team
+  lifecycle: production
+  providesApis:
+    - transaction-api
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: user-account-service
+  description: Stores user payment credentials and settings.
+spec:
+  type: service
+  owner: payments-team
+  lifecycle: production
+  providesApis:
+    - user-account-api
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: fraud-detection-service
+  description: Monitors transactions for potential fraud.
+spec:
+  type: service
+  owner: security-team
+  lifecycle: production
+  providesApis:
+    - fraud-detection-api
