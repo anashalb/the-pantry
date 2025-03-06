@@ -74,13 +74,10 @@ class GetRecipeHandlerTests {
 
     @Test
     void handle_ShouldReturnRecipeDetailsDto_WhenRecipeExists() throws RecipeNotFoundException {
-        // Arrange
         when(recipeRepository.getRecipeDetailsByRecipeId(recipeId)).thenReturn(Optional.of(recipeEntity));
 
-        // Act
         RecipeDetailsDto result = getRecipeHandler.handle(getRecipeDto);
 
-        // Assert
         assertNotNull(result);
         assertEquals(recipeId, result.getRecipeId());
         assertEquals("Test Recipe", result.getName());
@@ -95,23 +92,19 @@ class GetRecipeHandlerTests {
         assertEquals(1, result.getSteps().size());
         assertEquals("Mix all ingredients together.", result.getSteps().getFirst().getInstructions());
 
-        // Verify interactions
         verify(recipeRepository, times(1)).getRecipeDetailsByRecipeId(recipeId);
     }
 
     @Test
     void handle_ShouldThrowRecipeNotFoundException_WhenRecipeDoesNotExist() {
-        // Arrange
         when(recipeRepository.getRecipeDetailsByRecipeId(recipeId)).thenReturn(Optional.empty());
 
-        // Act & Assert
         RecipeNotFoundException thrown = assertThrows(RecipeNotFoundException.class, () -> {
             getRecipeHandler.handle(getRecipeDto);
         });
 
         assertEquals(recipeId, thrown.getRecipeId());
 
-        // Verify interactions
         verify(recipeRepository, times(1)).getRecipeDetailsByRecipeId(recipeId);
     }
 }

@@ -52,17 +52,14 @@ class GetRecipesCreatedByUserHandlerTests {
 
     @Test
     void testHandle() {
-        // Arrange
         Sort sort = Sort.by(Sort.Direction.DESC, requestDto.getSortBy());
         Pageable pageable = PageRequest.of(requestDto.getPageNumber(), requestDto.getPageSize(), sort);
         Page<RecipeEntity> mockPage = new PageImpl<>(List.of(sampleRecipe), pageable, 1);
 
         when(recipeRepository.getRecipesCreatedByUserId(testUserId, pageable)).thenReturn(mockPage);
 
-        // Act
         PaginatedResult<UserRecipeDto> result = handler.handle(requestDto);
 
-        // Assert
         assertEquals(1, result.getTotal());
         assertEquals(1, result.getCount());
         assertEquals(sampleRecipe.getName(), result.getItems().iterator().next().getName());

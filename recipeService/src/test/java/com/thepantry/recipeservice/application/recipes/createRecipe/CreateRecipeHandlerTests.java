@@ -53,23 +53,18 @@ class CreateRecipeHandlerTests {
 
     @Test
     void testHandle_Success() throws BusinessRuleException {
-        // Arrange: Mock repository behavior
         when(recipeRepository.createRecipe(any(RecipeEntity.class))).thenReturn(sampleRecipeEntity);
 
-        // Act
         CreateRecipeDto result = createRecipeHandler.handle(createRecipeRequest);
 
-        // Assert
         assertNotNull(result);
         assertNotNull(result.recipeId());
 
-        // Verify repository interaction
         verify(recipeRepository, times(1)).createRecipe(any(RecipeEntity.class));
     }
 
     @Test
     void testHandle_BusinessRuleException() {
-        // Arrange: Simulate rule violation
         CreateRecipeRequest invalidRequest = new CreateRecipeRequest(
                 "", // Invalid name (empty)
                 "Test description",
@@ -79,10 +74,8 @@ class CreateRecipeHandlerTests {
                 (short) 4
         );
 
-        // Act & Assert: Expect BusinessRuleException to be thrown
         assertThrows(BusinessRuleException.class, () -> createRecipeHandler.handle(invalidRequest));
 
-        // Verify repository was never called
         verify(recipeRepository, never()).createRecipe(any(RecipeEntity.class));
     }
 }

@@ -5,40 +5,40 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class RecipeNameLengthShouldBeAtLeastThreeCharsTests {
+
     @Test
-    void testRuleIsBroken_WhenNameIsTooShort() {
+    void testIsBroken_WhenNameIsTooShort_ShouldReturnTrue() {
         RecipeNameLengthShouldBeAtLeastThreeChars rule = new RecipeNameLengthShouldBeAtLeastThreeChars("ab");
-        assertTrue(rule.isBroken(), "Rule should be broken for names shorter than 3 characters");
+        assertTrue(rule.isBroken(), "Expected rule to be broken when name is shorter than three characters.");
     }
 
     @Test
-    void testRuleIsNotBroken_WhenNameIsValid() {
+    void testIsBroken_WhenNameIsValid_ShouldReturnFalse() {
         RecipeNameLengthShouldBeAtLeastThreeChars rule = new RecipeNameLengthShouldBeAtLeastThreeChars("abc");
-        assertFalse(rule.isBroken(), "Rule should not be broken for names with 3 or more characters");
+        assertFalse(rule.isBroken(), "Expected rule NOT to be broken when name has three or more characters.");
     }
 
     @Test
-    void testRuleIsNotBroken_WhenNameIsLongEnough() {
+    void testIsBroken_WhenNameIsLongEnough_ShouldReturnFalse() {
         RecipeNameLengthShouldBeAtLeastThreeChars rule = new RecipeNameLengthShouldBeAtLeastThreeChars("long name");
-        assertFalse(rule.isBroken(), "Rule should not be broken for long names");
+        assertFalse(rule.isBroken(), "Expected rule NOT to be broken when name is long enough.");
     }
 
     @Test
-    void testRuleIsNotBroken_WhenNameIsExactlyThreeChars() {
+    void testIsBroken_WhenNameIsExactlyThreeChars_ShouldReturnFalse() {
         RecipeNameLengthShouldBeAtLeastThreeChars rule = new RecipeNameLengthShouldBeAtLeastThreeChars("abc");
-        assertFalse(rule.isBroken(), "Rule should not be broken when name is exactly 3 characters");
+        assertFalse(rule.isBroken(), "Expected rule NOT to be broken when name is exactly three characters.");
     }
 
     @Test
-    void testRuleIsBroken_WhenNameIsNull() {
+    void testIsBroken_WhenNameIsNull_ShouldReturnFalse() {
         RecipeNameLengthShouldBeAtLeastThreeChars rule = new RecipeNameLengthShouldBeAtLeastThreeChars(null);
-        assertFalse(rule.isBroken(), "Rule should not be broken for null names as it is not explicitly checked");
+        assertFalse(rule.isBroken(), "Expected rule NOT to be broken when name is null as it is not explicitly checked.");
     }
 
     @Test
-    void testErrorMessage() {
+    void testGetMessage_WhenNameIsTooShort_ShouldReturnExpectedMessage() {
         RecipeNameLengthShouldBeAtLeastThreeChars rule = new RecipeNameLengthShouldBeAtLeastThreeChars("ab");
         assertEquals("Recipe name should be at least three characters long", rule.getMessage());
     }
-
 }

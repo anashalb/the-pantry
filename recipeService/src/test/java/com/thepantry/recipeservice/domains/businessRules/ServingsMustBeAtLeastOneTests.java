@@ -7,21 +7,21 @@ import static org.junit.jupiter.api.Assertions.*;
 class ServingsMustBeAtLeastOneTests {
 
     @Test
-    void shouldNotBeBrokenWhenServingsIsOne() {
+    void testIsBroken_WhenServingsIsOne_ShouldReturnFalse() {
         ServingsMustBeAtLeastOne rule = new ServingsMustBeAtLeastOne((short) 1);
-        assertFalse(rule.isBroken(), "Rule should not be broken when servings is 1");
+        assertFalse(rule.isBroken(), "Expected rule NOT to be broken when servings is exactly one.");
     }
 
     @Test
-    void shouldBeBrokenWhenServingsIsZero() {
+    void testIsBroken_WhenServingsIsZero_ShouldReturnTrue() {
         ServingsMustBeAtLeastOne rule = new ServingsMustBeAtLeastOne((short) 0);
-        assertTrue(rule.isBroken(), "Rule should be broken when servings is 0");
+        assertTrue(rule.isBroken(), "Expected rule to be broken when servings is zero.");
         assertEquals("A recipe should be for at least one serving", rule.getMessage());
     }
 
     @Test
-    void shouldNotBeBrokenWhenServingsIsNull() {
+    void testIsBroken_WhenServingsIsNull_ShouldReturnFalse() {
         ServingsMustBeAtLeastOne rule = new ServingsMustBeAtLeastOne(null);
-        assertFalse(rule.isBroken(), "Rule should not be broken when servings is null");
+        assertFalse(rule.isBroken(), "Expected rule NOT to be broken when servings is null.");
     }
 }

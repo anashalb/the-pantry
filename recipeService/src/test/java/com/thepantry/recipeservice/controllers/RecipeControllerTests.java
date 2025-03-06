@@ -95,13 +95,12 @@ class RecipeControllerTests {
 
     @Test
     void createRecipe_ShouldReturnSuccessResponse_WhenRecipeIsCreated() throws Exception {
-        // Given
+
         CreateRecipeRequest createRecipeRequest = new CreateRecipeRequest("New Recipe", "A delicious meal", 20L, 10L, 30L, (short) 2);
         CreateRecipeDto createdRecipe = new CreateRecipeDto(recipeId);
 
         when(createRecipeHandler.handle(any(CreateRecipeRequest.class))).thenReturn(createdRecipe);
 
-        // When & Then
         mockMvc.perform(post("/recipes")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createRecipeRequest)))
@@ -111,7 +110,7 @@ class RecipeControllerTests {
 
     @Test
     void createRecipe_ShouldReturnErrorResponse_WhenBusinessRuleExceptionIsThrown() throws Exception {
-        // Given
+
         CreateRecipeRequest createRecipeRequest = new CreateRecipeRequest("Invalid Recipe", "Should fail", 10L, 5L, 15L, (short) 1);
         IBusinessRule mockRule = mock(IBusinessRule.class);
         when(mockRule.getMessage()).thenReturn("Recipe creation rule violated");
@@ -120,7 +119,6 @@ class RecipeControllerTests {
 
         when(createRecipeHandler.handle(any(CreateRecipeRequest.class))).thenThrow(exception);
 
-        // When & Then
         mockMvc.perform(post("/recipes")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createRecipeRequest)))

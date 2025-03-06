@@ -7,41 +7,26 @@ import static org.junit.jupiter.api.Assertions.*;
 class RecipeStepInstructionsMustBeAtLeastThreeCharsTests {
 
     @Test
-    void shouldReturnBrokenWhenStepInstructionsAreTooShort() {
-        // Given
-        String shortInstruction = "Hi"; // Less than 3 characters
+    void testIsBroken_WhenStepInstructionsAreTooShort_ShouldReturnTrue() {
+        String shortInstruction = "Hi";
         RecipeStepInstructionsMustBeAtLeastThreeChars rule = new RecipeStepInstructionsMustBeAtLeastThreeChars(shortInstruction);
 
-        // When
-        boolean result = rule.isBroken();
-
-        // Then
-        assertTrue(result);
+        assertTrue(rule.isBroken(), "Expected rule to be broken when step instructions are shorter than three characters.");
         assertEquals("Step instructions should be at least three characters long", rule.getMessage());
     }
 
     @Test
-    void shouldNotBeBrokenWhenStepInstructionsAreThreeOrMoreCharacters() {
-        // Given
+    void testIsBroken_WhenStepInstructionsAreThreeOrMoreCharacters_ShouldReturnFalse() {
         String validInstruction = "Mix";
         RecipeStepInstructionsMustBeAtLeastThreeChars rule = new RecipeStepInstructionsMustBeAtLeastThreeChars(validInstruction);
 
-        // When
-        boolean result = rule.isBroken();
-
-        // Then
-        assertFalse(result);
+        assertFalse(rule.isBroken(), "Expected rule NOT to be broken when step instructions have three or more characters.");
     }
 
     @Test
-    void shouldNotBeBrokenWhenStepInstructionsAreNull() {
-        // Given
+    void testIsBroken_WhenStepInstructionsAreNull_ShouldReturnFalse() {
         RecipeStepInstructionsMustBeAtLeastThreeChars rule = new RecipeStepInstructionsMustBeAtLeastThreeChars(null);
 
-        // When
-        boolean result = rule.isBroken();
-
-        // Then
-        assertFalse(result);
+        assertFalse(rule.isBroken(), "Expected rule NOT to be broken when step instructions are null.");
     }
 }

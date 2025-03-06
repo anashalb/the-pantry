@@ -7,30 +7,24 @@ import static org.mockito.Mockito.*;
 class BusinessRuleExceptionTests {
 
     @Test
-    void shouldStoreBrokenRuleAndMessage() {
-        // Given
+    void testConstructor_WhenRuleIsBroken_ShouldStoreBrokenRuleAndMessage() {
         IBusinessRule mockRule = mock(IBusinessRule.class);
         when(mockRule.getMessage()).thenReturn("Rule violated");
 
-        // When
         BusinessRuleException exception = new BusinessRuleException(mockRule);
 
-        // Then
-        assertEquals(mockRule, exception.getBrokenRule());
-        assertEquals("Rule violated", exception.getDetails());
-        assertEquals("Rule violated", exception.getMessage());
+        assertEquals(mockRule, exception.getBrokenRule(), "Expected exception to store the broken rule.");
+        assertEquals("Rule violated", exception.getDetails(), "Expected exception details to match the rule message.");
+        assertEquals("Rule violated", exception.getMessage(), "Expected exception message to match the rule message.");
     }
 
     @Test
-    void shouldReturnMessageAsToString() {
-        // Given
+    void testToString_WhenRuleIsBroken_ShouldReturnMessage() {
         IBusinessRule mockRule = mock(IBusinessRule.class);
         when(mockRule.getMessage()).thenReturn("Another rule violation");
 
-        // When
         BusinessRuleException exception = new BusinessRuleException(mockRule);
 
-        // Then
-        assertEquals("Another rule violation", exception.toString());
+        assertEquals("Another rule violation", exception.toString(), "Expected toString() to return the rule violation message.");
     }
 }

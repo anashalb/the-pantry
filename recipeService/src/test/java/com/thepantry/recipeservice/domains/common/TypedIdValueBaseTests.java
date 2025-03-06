@@ -9,16 +9,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class TypedIdValueBaseTests {
 
-    private UUID uuid1;
-    private UUID uuid2;
     private TypedIdValueBase id1;
     private TypedIdValueBase id2;
     private TypedIdValueBase id3;
 
     @BeforeEach
     void setUp() {
-        uuid1 = UUID.randomUUID();
-        uuid2 = UUID.randomUUID();
+        UUID uuid1 = UUID.randomUUID();
+        UUID uuid2 = UUID.randomUUID();
         id1 = new ConcreteTypedId(uuid1);
         id2 = new ConcreteTypedId(uuid1); // Same UUID as id1
         id3 = new ConcreteTypedId(uuid2); // Different UUID
@@ -51,12 +49,12 @@ class TypedIdValueBaseTests {
 
     @Test
     void testEqualsMethod_ShouldHandleNull() {
-        assertNotEquals(id1, null, "An object should not be equal to null");
+        assertNotEquals(null, id1, "An object should not be equal to null");
     }
 
     @Test
     void testEqualsMethod_ShouldHandleDifferentClass() {
-        assertNotEquals(id1, "String", "An object should not be equal to a different class");
+        assertNotEquals("String", id1, "An object should not be equal to a different class");
     }
 
     @Test

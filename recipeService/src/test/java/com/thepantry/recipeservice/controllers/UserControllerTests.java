@@ -55,10 +55,9 @@ class UserControllerTests {
 
     @Test
     void getRecipesCreatedByUser_ShouldReturnSuccessResponse_WhenRecipesExist() throws Exception {
-        // Arrange
+
         when(getRecipesCreatedByUserHandler.handle(any(GetRecipesCreatedByUserDto.class))).thenReturn(mockRecipes);
 
-        // Act & Assert
         mockMvc.perform(get("/users/{userId}/recipes", userId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -74,11 +73,10 @@ class UserControllerTests {
 
     @Test
     void getRecipesCreatedByUser_ShouldReturnEmptyList_WhenNoRecipesExist() throws Exception {
-        // Arrange
+
         PaginatedResult<UserRecipeDto> result = new PaginatedResult<>(0, 0, List.of());
         when(getRecipesCreatedByUserHandler.handle(any(GetRecipesCreatedByUserDto.class))).thenReturn(result);
 
-        // Act & Assert
         mockMvc.perform(get("/users/{userId}/recipes", userId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
