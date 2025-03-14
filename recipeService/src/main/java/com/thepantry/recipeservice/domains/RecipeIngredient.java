@@ -26,6 +26,7 @@ public class RecipeIngredient extends DomainModel {
         this.measurementUnit = measurementUnit;
     }
 
+    // @TODO: Move the unit validation here instead of on the Recipe Domain
     public static RecipeIngredient of(
             Ingredient ingredient,
             String preparationMethod,
