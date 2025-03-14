@@ -1,27 +1,38 @@
 package com.thepantry.recipeservice.domains;
 
+import com.thepantry.recipeservice.domains.businessRules.RecipeIngredientQuantityShouldBeMoreThanZero;
+import com.thepantry.recipeservice.domains.common.BusinessRuleException;
+import com.thepantry.recipeservice.domains.common.DomainModel;
+import lombok.Getter;
 import lombok.ToString;
-import lombok.Value;
 
-@Value(staticConstructor = "of")
+@Getter
 @ToString
-public class RecipeIngredient {
+public class RecipeIngredient extends DomainModel {
 
     Ingredient ingredient;
     String preparationMethod;
     double quantity;
     MeasurementUnit measurementUnit;
-//
-//  public static RecipeIngredient of(Ingredient ingredient, MeasurementUnit measurementUnit, double quantity) {
-//
-//    if (quantity < 1) {
-//      throw new IllegalArgumentException("Quantity cannot be less than 1");
-//    }
-//
-//    if (ingredient.getMeasurementType() != measurementUnit.getMeasurementType()) {
-//      throw new IllegalArgumentException("Ingredient must be measured by the same measurement unit type");
-//    }
-//
-//    return new RecipeIngredient(ingredient, measurementUnit, quantity);
-//  }
+
+    private RecipeIngredient(
+            Ingredient ingredient,
+            String preparationMethod,
+            double quantity,
+            MeasurementUnit measurementUnit) {
+        this.ingredient = ingredient;
+        this.preparationMethod = preparationMethod;
+        this.quantity = quantity;
+        this.measurementUnit = measurementUnit;
+    }
+
+    public static RecipeIngredient of(
+            Ingredient ingredient,
+            String preparationMethod,
+            double quantity,
+            MeasurementUnit measurementUnit) throws BusinessRuleException {
+
+        checkRule(new RecipeIngredientQuantityShouldBeMoreThanZero(quantity));
+        return new RecipeIngredient(ingredient, preparationMethod, quantity, measurementUnit);
+    }
 }

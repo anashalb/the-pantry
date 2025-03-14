@@ -61,6 +61,9 @@ public class RecipeRepositoryImpl implements IRecipeRepository {
 
     @Override
     public RecipeEntity createRecipe(RecipeEntity recipeEntity) {
-        return this.recipeRepository.save(recipeEntity);
+        RecipeEntity createdRecipe = this.recipeRepository.save(recipeEntity);
+        this.recipeIngredientRepository.saveAll(createdRecipe.getRecipeIngredients());
+        this.recipeStepRepository.saveAll(createdRecipe.getRecipeSteps());
+        return createdRecipe;
     }
 }

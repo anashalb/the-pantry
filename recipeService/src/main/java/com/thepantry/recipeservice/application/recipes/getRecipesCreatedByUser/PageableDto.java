@@ -22,7 +22,9 @@ public abstract class PageableDto {
     }
 
     public PageableDto() {
-
+        this.pageNumber = this.getDefaultPageNumber();
+        this.pageSize = this.getDefaultPageSize();
+        this.sortBy = this.getDefaultSortField();
     }
 
     public abstract List<String> getSortableFields();

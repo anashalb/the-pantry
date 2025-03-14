@@ -26,5 +26,4 @@ public class RecipeStepEntity {
 
     @Column(name = "instructions", nullable = false, length = Integer.MAX_VALUE)
     private String instructions;
-
 }

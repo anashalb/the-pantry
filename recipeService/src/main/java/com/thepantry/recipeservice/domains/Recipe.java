@@ -37,7 +37,10 @@ public class Recipe extends DomainModel {
             Duration cookingTimeMinutes,
             Duration preparationTimeMinutes,
             Duration readyInTimeMinutes,
-            Short servings
+            Short servings,
+            List<RecipeIngredient> ingredients,
+            List<RecipeStep> steps,
+            IUnitConfiguration unitConfiguration
     ) throws BusinessRuleException {
 
         Recipe recipe = new Recipe();
@@ -47,6 +50,14 @@ public class Recipe extends DomainModel {
         recipe.setPreparationTimeMinutes(preparationTimeMinutes);
         recipe.setReadyInTimeMinutes(readyInTimeMinutes);
         recipe.setServings(servings);
+
+        for (RecipeIngredient ingredient : ingredients) {
+            recipe.addIngredient(ingredient);
+        }
+
+        for (RecipeStep step : steps) {
+            recipe.addStep(step);
+        }
 
         return recipe;
     }
@@ -81,11 +92,11 @@ public class Recipe extends DomainModel {
         this.ReadyInTimeMinutes = readyInTimeMinutes;
     }
 
-    public void addIngredient(RecipeIngredient recipeIngredient) throws BusinessRuleException {
+    private void addIngredient(RecipeIngredient recipeIngredient) {
         ingredients.add(recipeIngredient);
     }
 
-    public void addStep(RecipeStep step) {
+    private void addStep(RecipeStep step) {
         this.steps.add(step);
     }
 

@@ -4,4 +4,5 @@ import java.util.UUID;
 
 public record CreateRecipeDto(
         UUID recipeId
-) {}
+) {
+}

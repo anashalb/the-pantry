@@ -6,11 +6,11 @@ import java.util.UUID;
 
 public class RecipeId extends TypedIdValueBase {
 
-    protected RecipeId() {
+    public RecipeId() {
         super();
     }
 
-    protected RecipeId(UUID value) {
+    public RecipeId(UUID value) {
         super(value);
     }
 }

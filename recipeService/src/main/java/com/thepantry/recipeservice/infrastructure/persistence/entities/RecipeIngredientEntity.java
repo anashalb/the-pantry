@@ -6,6 +6,8 @@ import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @Entity
@@ -22,17 +24,14 @@ public class RecipeIngredientEntity {
     private RecipeEntity recipe;
 
     @Column(name = "ingredient_id", nullable = false)
-    private Long ingredient;
+    private UUID ingredientId;
 
     @Column(name = "quantity", nullable = false)
     private Double quantity;
 
-    @Column(name = "preparation_method", nullable = true, length = 256)
+    @Column(name = "preparation_method", length = 256)
     private String preparationMethod;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.SET_NULL)
-    @JoinColumn(name = "measurement_unit_id", nullable = false)
-    private MeasurementUnitEntity measurementUnit;
-
+    @Column(name = "measurement_unit", nullable = false)
+    private String measurementUnit;
 }

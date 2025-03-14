@@ -52,30 +52,30 @@ VALUES ('e183275b-3653-4ba6-be4e-19e2f9afae4b', 'Kibbeh Labaniyeh',
         40, 20, 60, 4, 'e183275b-3653-4ba6-be4e-19e2f9afae4b');
 
 -- Insert ingredients (Replace ingredient_id values with actual IDs from your database)
-INSERT INTO recipes.recipe_ingredient(ingredient_id, recipe_id, quantity, measurement_unit_id, preparation_method)
+INSERT INTO recipes.recipe_ingredient(ingredient_id, recipe_id, quantity, measurement_unit, preparation_method)
 VALUES
     -- **Kibbeh Labaniyeh Ingredients**
-    (1, (SELECT id FROM recipes.recipe WHERE recipe_id = 'e183275b-3653-4ba6-be4e-19e2f9afae4b'), 500,
-     (SELECT id FROM measurements.measurement_unit WHERE short_name = 'g'), 'Minced'),
+    (gen_random_uuid(), (SELECT id FROM recipes.recipe WHERE recipe_id = 'e183275b-3653-4ba6-be4e-19e2f9afae4b'), 500,
+     (SELECT short_name FROM measurements.measurement_unit WHERE short_name = 'g'), 'Minced'),
 
-    (2, (SELECT id FROM recipes.recipe WHERE recipe_id = 'e183275b-3653-4ba6-be4e-19e2f9afae4b'), 1,
-     (SELECT id FROM measurements.measurement_unit WHERE short_name = 'L'), 'Strained'),
+    (gen_random_uuid(), (SELECT id FROM recipes.recipe WHERE recipe_id = 'e183275b-3653-4ba6-be4e-19e2f9afae4b'), 1,
+     (SELECT short_name FROM measurements.measurement_unit WHERE short_name = 'L'), 'Strained'),
 
-    (3, (SELECT id FROM recipes.recipe WHERE recipe_id = 'e183275b-3653-4ba6-be4e-19e2f9afae4b'), 200,
-     (SELECT id FROM measurements.measurement_unit WHERE short_name = 'g'), 'Soaked and Drained'),
+    (gen_random_uuid(), (SELECT id FROM recipes.recipe WHERE recipe_id = 'e183275b-3653-4ba6-be4e-19e2f9afae4b'), 200,
+     (SELECT short_name FROM measurements.measurement_unit WHERE short_name = 'g'), 'Soaked and Drained'),
 
-    (4, (SELECT id FROM recipes.recipe WHERE recipe_id = 'e183275b-3653-4ba6-be4e-19e2f9afae4b'), 1,
-     (SELECT id FROM measurements.measurement_unit WHERE short_name = 'tbsp'), 'Ground'),
+    (gen_random_uuid(), (SELECT id FROM recipes.recipe WHERE recipe_id = 'e183275b-3653-4ba6-be4e-19e2f9afae4b'), 1,
+     (SELECT short_name FROM measurements.measurement_unit WHERE short_name = 'tbsp'), 'Ground'),
 
     -- **Dawood Basha Ingredients**
-    (1, (SELECT id FROM recipes.recipe WHERE recipe_id = 'b183275b-3653-4ba6-be4e-19e2f9afae4b'), 500,
-     (SELECT id FROM measurements.measurement_unit WHERE short_name = 'g'), 'Ground'),
+    (gen_random_uuid(), (SELECT id FROM recipes.recipe WHERE recipe_id = 'b183275b-3653-4ba6-be4e-19e2f9afae4b'), 500,
+     (SELECT short_name FROM measurements.measurement_unit WHERE short_name = 'g'), 'Ground'),
 
-    (3, (SELECT id FROM recipes.recipe WHERE recipe_id = 'b183275b-3653-4ba6-be4e-19e2f9afae4b'), 2,
-     (SELECT id FROM measurements.measurement_unit WHERE short_name = 'tbsp'), 'Chopped'),
+    (gen_random_uuid(), (SELECT id FROM recipes.recipe WHERE recipe_id = 'b183275b-3653-4ba6-be4e-19e2f9afae4b'), 2,
+     (SELECT short_name FROM measurements.measurement_unit WHERE short_name = 'tbsp'), 'Chopped'),
 
-    (5, (SELECT id FROM recipes.recipe WHERE recipe_id = 'b183275b-3653-4ba6-be4e-19e2f9afae4b'), 1,
-     (SELECT id FROM measurements.measurement_unit WHERE short_name = 'L'), 'Diced');
+    (gen_random_uuid(), (SELECT id FROM recipes.recipe WHERE recipe_id = 'b183275b-3653-4ba6-be4e-19e2f9afae4b'), 1,
+     (SELECT short_name FROM measurements.measurement_unit WHERE short_name = 'L'), 'Diced');
 
 -- Insert cooking steps
 INSERT INTO recipes.recipe_step(step_number, instructions, recipe_id)
