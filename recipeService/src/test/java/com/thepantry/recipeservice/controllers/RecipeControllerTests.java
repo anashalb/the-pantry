@@ -1,9 +1,7 @@
 package com.thepantry.recipeservice.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.thepantry.recipeservice.application.recipes.createRecipe.CreateRecipeDto;
-import com.thepantry.recipeservice.application.recipes.createRecipe.CreateRecipeHandler;
-import com.thepantry.recipeservice.application.recipes.createRecipe.CreateRecipeRequest;
+import com.thepantry.recipeservice.application.recipes.createRecipe.*;
 import com.thepantry.recipeservice.application.recipes.getRecipeDetails.GetRecipeDto;
 import com.thepantry.recipeservice.application.recipes.getRecipeDetails.GetRecipeHandler;
 import com.thepantry.recipeservice.application.recipes.getRecipeDetails.RecipeDetailsDto;
@@ -22,13 +20,15 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -54,11 +54,15 @@ class RecipeControllerTests {
 
     private UUID recipeId;
     private RecipeDetailsDto recipeDetails;
+    private List<RecipeIngredientRequest> recipeIngredients;
+    private List<RecipeStepRequest> recipeSteps;
 
     @BeforeEach
     void setUp() {
         recipeId = UUID.randomUUID();
         recipeDetails = new RecipeDetailsDto(recipeId, "Test Recipe", "Description", 30L, 15L, 45L, (short) 4, null, null);
+        recipeIngredients = new ArrayList<>();
+        recipeSteps = new ArrayList<>();
     }
 
     @Test
@@ -96,7 +100,16 @@ class RecipeControllerTests {
     @Test
     void createRecipe_ShouldReturnSuccessResponse_WhenRecipeIsCreated() throws Exception {
 
-        CreateRecipeRequest createRecipeRequest = new CreateRecipeRequest("New Recipe", "A delicious meal", 20L, 10L, 30L, (short) 2);
+        CreateRecipeRequest createRecipeRequest = new CreateRecipeRequest(
+                "New Recipe",
+                "A delicious meal",
+                20L,
+                10L,
+                30L,
+                (short) 2,
+                recipeIngredients,
+                recipeSteps);
+
         CreateRecipeDto createdRecipe = new CreateRecipeDto(recipeId);
 
         when(createRecipeHandler.handle(any(CreateRecipeRequest.class))).thenReturn(createdRecipe);
@@ -111,7 +124,15 @@ class RecipeControllerTests {
     @Test
     void createRecipe_ShouldReturnErrorResponse_WhenBusinessRuleExceptionIsThrown() throws Exception {
 
-        CreateRecipeRequest createRecipeRequest = new CreateRecipeRequest("Invalid Recipe", "Should fail", 10L, 5L, 15L, (short) 1);
+        CreateRecipeRequest createRecipeRequest = new CreateRecipeRequest(
+                "Invalid Recipe",
+                "Should fail",
+                10L,
+                5L,
+                15L, (short) 1,
+                recipeIngredients,
+                recipeSteps);
+
         IBusinessRule mockRule = mock(IBusinessRule.class);
         when(mockRule.getMessage()).thenReturn("Recipe creation rule violated");
 

@@ -1,6 +1,7 @@
 package com.thepantry.recipeservice.application.recipes.getRecipeDetails;
 
 import com.thepantry.recipeservice.application.recipes.IRecipeRepository;
+import com.thepantry.recipeservice.domains.IUnitConfiguration;
 import com.thepantry.recipeservice.infrastructure.persistence.entities.RecipeEntity;
 import org.springframework.stereotype.Component;
 
@@ -10,9 +11,13 @@ import java.util.List;
 public class GetRecipeHandler {
 
     private final IRecipeRepository recipeRepository;
+    private final IUnitConfiguration unitConfiguration;
 
-    public GetRecipeHandler(IRecipeRepository recipeRepository) {
+    public GetRecipeHandler(
+            IRecipeRepository recipeRepository,
+            IUnitConfiguration unitConfiguration) {
         this.recipeRepository = recipeRepository;
+        this.unitConfiguration = unitConfiguration;
     }
 
     public RecipeDetailsDto handle(GetRecipeDto getRecipeDto) throws RecipeNotFoundException {
@@ -25,7 +30,7 @@ public class GetRecipeHandler {
                         new RecipeIngredientDto(recipeIngredient.getId(),
                                 recipeIngredient.getPreparationMethod(),
                                 recipeIngredient.getQuantity(),
-                                recipeIngredient.getMeasurementUnit().getName()))
+                                recipeIngredient.getMeasurementUnit()))
                 .toList();
 
         List<RecipeStepDto> recipeSteps = recipeEntity.getRecipeSteps().stream()

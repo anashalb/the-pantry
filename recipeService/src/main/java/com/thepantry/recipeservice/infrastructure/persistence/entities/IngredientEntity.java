@@ -6,9 +6,6 @@ import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 @Getter
 @Setter
 @Entity
@@ -19,6 +16,9 @@ public class IngredientEntity {
     @Column(name = "id", nullable = false)
     private Integer id;
 
+    @Column(name = "ingredient_id", nullable = false)
+    private Integer ingredientId;
+
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
@@ -26,8 +26,4 @@ public class IngredientEntity {
     @OnDelete(action = OnDeleteAction.SET_NULL)
     @JoinColumn(name = "measurement_unit_id", nullable = false)
     private MeasurementUnitEntity measurementUnit;
-
-    @OneToMany(mappedBy = "ingredient")
-    private Set<RecipeIngredientEntity> recipeIngredients = new LinkedHashSet<>();
-
 }

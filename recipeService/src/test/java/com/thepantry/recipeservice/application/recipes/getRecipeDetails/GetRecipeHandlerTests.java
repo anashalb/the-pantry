@@ -58,7 +58,7 @@ class GetRecipeHandlerTests {
         RecipeIngredientEntity ingredient = new RecipeIngredientEntity();
         ingredient.setId(new Random().nextLong());
         ingredient.setQuantity(2.0);
-        ingredient.setMeasurementUnit(measurementUnit);
+        ingredient.setMeasurementUnit(measurementUnit.getName());
 
         recipeIngredients = List.of(ingredient);
         recipeEntity.setRecipeIngredients(recipeIngredients);

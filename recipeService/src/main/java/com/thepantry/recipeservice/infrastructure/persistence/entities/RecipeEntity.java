@@ -50,12 +50,13 @@ public class RecipeEntity {
     @OneToMany(mappedBy = "recipe")
     private List<RecipeStepEntity> recipeSteps = new ArrayList<>();
 
+    // TODO: Control from domain; create a SystemTime common class
     @ColumnDefault("CURRENT_TIMESTAMP")
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false, insertable = false, updatable = false)
     private Instant createdAt;
 
+    // TODO: Control from domain
     @ColumnDefault("CURRENT_TIMESTAMP")
-    @Column(name = "updated_at")
+    @Column(name = "updated_at", nullable = false, insertable = false)
     private Instant updatedAt;
-
 }

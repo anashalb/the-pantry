@@ -11,7 +11,6 @@ import java.util.UUID;
 @Repository
 public interface IRecipeRepository {
 
-
     /**
      * Retrieves the complete details of a recipe by its unique identifier.
      *
