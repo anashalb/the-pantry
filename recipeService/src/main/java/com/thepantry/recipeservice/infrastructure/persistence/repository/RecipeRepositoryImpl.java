@@ -66,4 +66,9 @@ public class RecipeRepositoryImpl implements IRecipeRepository {
         this.recipeStepRepository.saveAll(createdRecipe.getRecipeSteps());
         return createdRecipe;
     }
+
+    @Override
+    public boolean deleteRecipe(UUID recipeId) {
+        return this.recipeRepository.deleteByRecipeId(recipeId) == 1;
+    }
 }

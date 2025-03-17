@@ -11,13 +11,10 @@ import java.util.List;
 public class GetRecipeHandler {
 
     private final IRecipeRepository recipeRepository;
-    private final IUnitConfiguration unitConfiguration;
 
     public GetRecipeHandler(
-            IRecipeRepository recipeRepository,
-            IUnitConfiguration unitConfiguration) {
+            IRecipeRepository recipeRepository) {
         this.recipeRepository = recipeRepository;
-        this.unitConfiguration = unitConfiguration;
     }
 
     public RecipeDetailsDto handle(GetRecipeDto getRecipeDto) throws RecipeNotFoundException {

@@ -2,6 +2,8 @@ package com.thepantry.recipeservice.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thepantry.recipeservice.application.recipes.createRecipe.*;
+import com.thepantry.recipeservice.application.recipes.deleteRecipe.DeleteRecipeHandler;
+import com.thepantry.recipeservice.application.recipes.deleteRecipe.DeleteRecipeRequest;
 import com.thepantry.recipeservice.application.recipes.getRecipeDetails.GetRecipeDto;
 import com.thepantry.recipeservice.application.recipes.getRecipeDetails.GetRecipeHandler;
 import com.thepantry.recipeservice.application.recipes.getRecipeDetails.RecipeDetailsDto;
@@ -27,8 +29,7 @@ import java.util.UUID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -48,6 +49,9 @@ class RecipeControllerTests {
 
     @MockitoBean
     private CreateRecipeHandler createRecipeHandler;
+
+    @MockitoBean
+    private DeleteRecipeHandler deleteRecipeHandler;
 
     @InjectMocks
     private RecipeController recipeController;
@@ -146,5 +150,27 @@ class RecipeControllerTests {
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.error_code").value("RECIPE_NOT_CREATED"))
                 .andExpect(jsonPath("$.message").value(exception.getMessage()));
+    }
+
+    @Test
+    void deleteRecipe_ShouldReturnSuccessResponse_WhenRecipeIsDeleted() throws Exception {
+        UUID recipeId = UUID.randomUUID();
+        DeleteRecipeRequest request = new DeleteRecipeRequest(recipeId);
+        when(deleteRecipeHandler.handle(request)).thenReturn(true);
+
+        mockMvc.perform(delete("/recipes/{recipeId}", recipeId))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void deleteRecipe_ShouldReturnErrorResponse_WhenRecipeNotFound() throws Exception {
+        UUID recipeId = UUID.randomUUID();
+        DeleteRecipeRequest request = new DeleteRecipeRequest(recipeId);
+        when(deleteRecipeHandler.handle(request)).thenReturn(false);
+
+        mockMvc.perform(delete("/recipes/{recipeId}", recipeId))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error_code").value("RECIPE_NOT_DELETED"))
+                .andExpect(jsonPath("$.message").value("Recipe does not exist or could not be deleted"));
     }
 }
