@@ -3,10 +3,11 @@ package com.thepantry.recipeservice.application.recipes.getRecipesCreatedByUser;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Sort;
+
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class PageableDtoTests {
 

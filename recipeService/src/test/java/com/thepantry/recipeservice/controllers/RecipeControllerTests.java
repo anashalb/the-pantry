@@ -44,6 +44,9 @@ class RecipeControllerTests {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @InjectMocks
+    private RecipeController recipeController;
+
     @MockitoBean
     private GetRecipeHandler getRecipeHandler;
 
@@ -52,9 +55,6 @@ class RecipeControllerTests {
 
     @MockitoBean
     private DeleteRecipeHandler deleteRecipeHandler;
-
-    @InjectMocks
-    private RecipeController recipeController;
 
     private UUID recipeId;
     private RecipeDetailsDto recipeDetails;

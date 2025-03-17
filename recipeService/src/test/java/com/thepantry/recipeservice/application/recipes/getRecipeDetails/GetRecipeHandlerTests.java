@@ -23,17 +23,15 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class GetRecipeHandlerTests {
 
-    @Mock
-    private IRecipeRepository recipeRepository;
-
     @InjectMocks
     private GetRecipeHandler getRecipeHandler;
+
+    @Mock
+    private IRecipeRepository recipeRepository;
 
     private UUID recipeId;
     private GetRecipeDto getRecipeDto;
     private RecipeEntity recipeEntity;
-    private List<RecipeIngredientEntity> recipeIngredients;
-    private List<RecipeStepEntity> recipeSteps;
 
     @BeforeEach
     void setUp() {
@@ -60,7 +58,7 @@ class GetRecipeHandlerTests {
         ingredient.setQuantity(2.0);
         ingredient.setMeasurementUnit(measurementUnit.getName());
 
-        recipeIngredients = List.of(ingredient);
+        List<RecipeIngredientEntity> recipeIngredients = List.of(ingredient);
         recipeEntity.setRecipeIngredients(recipeIngredients);
 
         // Mock Steps
@@ -68,7 +66,7 @@ class GetRecipeHandlerTests {
         step.setStepNumber(1);
         step.setInstructions("Mix all ingredients together.");
 
-        recipeSteps = List.of(step);
+        List<RecipeStepEntity> recipeSteps = List.of(step);
         recipeEntity.setRecipeSteps(recipeSteps);
     }
 

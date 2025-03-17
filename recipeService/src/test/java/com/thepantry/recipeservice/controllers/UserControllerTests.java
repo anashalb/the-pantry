@@ -33,11 +33,11 @@ class UserControllerTests {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockitoBean
-    private GetRecipesCreatedByUserHandler getRecipesCreatedByUserHandler;
-
     @InjectMocks
     private UserController userController;
+
+    @MockitoBean
+    private GetRecipesCreatedByUserHandler getRecipesCreatedByUserHandler;
 
     private UUID userId;
     private PaginatedResult<UserRecipeDto> mockRecipes;

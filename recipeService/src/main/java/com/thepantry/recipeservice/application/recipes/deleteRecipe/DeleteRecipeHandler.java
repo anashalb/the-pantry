@@ -1,7 +1,6 @@
 package com.thepantry.recipeservice.application.recipes.deleteRecipe;
 
 import com.thepantry.recipeservice.application.recipes.IRecipeRepository;
-import com.thepantry.recipeservice.infrastructure.persistence.entities.RecipeEntity;
 import org.springframework.stereotype.Component;
 
 @Component

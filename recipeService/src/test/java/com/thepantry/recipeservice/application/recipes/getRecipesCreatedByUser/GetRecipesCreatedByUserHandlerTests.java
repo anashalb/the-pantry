@@ -19,11 +19,11 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class GetRecipesCreatedByUserHandlerTests {
 
-    @Mock
-    private IRecipeRepository recipeRepository;
-
     @InjectMocks
     private GetRecipesCreatedByUserHandler handler;
+
+    @Mock
+    private IRecipeRepository recipeRepository;
 
     private UUID testUserId;
     private RecipeEntity sampleRecipe;
@@ -62,7 +62,7 @@ class GetRecipesCreatedByUserHandlerTests {
 
         assertEquals(1, result.getTotal());
         assertEquals(1, result.getCount());
-        assertEquals(sampleRecipe.getName(), result.getItems().iterator().next().getName());
+        assertEquals(sampleRecipe.getName(), result.getItems().getFirst().getName());
 
         verify(recipeRepository, times(1)).getRecipesCreatedByUserId(testUserId, pageable);
     }

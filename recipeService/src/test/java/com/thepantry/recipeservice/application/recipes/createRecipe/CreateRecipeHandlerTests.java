@@ -22,10 +22,9 @@ import static org.mockito.Mockito.*;
 class CreateRecipeHandlerTests {
 
     private final IUnitConfiguration unitConfiguration = new UnitConfiguration();
+    private CreateRecipeHandler createRecipeHandler;
     @Mock
     private IRecipeRepository recipeRepository;
-    private CreateRecipeHandler createRecipeHandler;
-
     private CreateRecipeRequest createRecipeRequest;
     private RecipeEntity sampleRecipeEntity;
 

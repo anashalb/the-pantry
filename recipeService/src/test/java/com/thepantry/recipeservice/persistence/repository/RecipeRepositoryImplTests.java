@@ -33,6 +33,9 @@ import static org.mockito.Mockito.*;
 @ActiveProfiles("test")
 class RecipeRepositoryImplTests {
 
+    @InjectMocks
+    private RecipeRepositoryImpl recipeRepositoryImpl;
+
     @Mock
     private IRecipeCrudRepository recipeRepository;
 
@@ -41,9 +44,6 @@ class RecipeRepositoryImplTests {
 
     @Mock
     private IRecipeStepCrudRepository recipeStepRepository;
-
-    @InjectMocks
-    private RecipeRepositoryImpl recipeRepositoryImpl;
 
     private Long entityId;
     private UUID recipeId;

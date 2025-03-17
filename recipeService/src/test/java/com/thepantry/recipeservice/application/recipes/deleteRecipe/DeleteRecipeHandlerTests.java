@@ -1,8 +1,6 @@
 package com.thepantry.recipeservice.application.recipes.deleteRecipe;
 
 import com.thepantry.recipeservice.application.recipes.IRecipeRepository;
-import com.thepantry.recipeservice.infrastructure.persistence.repository.RecipeRepositoryImpl;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -11,17 +9,18 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DeleteRecipeHandlerTests {
 
-    @Mock
-    private IRecipeRepository recipeRepository;
-
     @InjectMocks
     private DeleteRecipeHandler deleteRecipeHandler;
+
+    @Mock
+    private IRecipeRepository recipeRepository;
 
     @Test
     void testHandle_shouldReturnTrue_WhenRecipeExists() {

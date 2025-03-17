@@ -1,7 +1,6 @@
 package com.thepantry.recipeservice.application.recipes.getRecipeDetails;
 
 import com.thepantry.recipeservice.application.recipes.IRecipeRepository;
-import com.thepantry.recipeservice.domains.IUnitConfiguration;
 import com.thepantry.recipeservice.infrastructure.persistence.entities.RecipeEntity;
 import org.springframework.stereotype.Component;
 

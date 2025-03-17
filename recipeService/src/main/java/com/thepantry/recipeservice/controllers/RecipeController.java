@@ -66,8 +66,7 @@ public class RecipeController {
         boolean isDeleted = this.deleteRecipeHandler.handle(deleteRecipeRequest);
         if (isDeleted) {
             return ResponseEntity.noContent().build();
-        }
-        else {
+        } else {
             return ResponseEntity.status(404).body(new ErrorResponse(
                     "RECIPE_NOT_DELETED",
                     "Recipe does not exist or could not be deleted"));
