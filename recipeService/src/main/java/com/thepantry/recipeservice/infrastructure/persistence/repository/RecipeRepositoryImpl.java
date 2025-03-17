@@ -19,7 +19,6 @@ public class RecipeRepositoryImpl implements IRecipeRepository {
     private final IRecipeStepCrudRepository recipeStepRepository;
     private final IRecipeCrudRepository recipeRepository;
 
-
     public RecipeRepositoryImpl(
             IRecipeCrudRepository recipeRepository,
             IRecipeIngredientCrudRepository recipeIngredientRepository,
@@ -60,7 +59,32 @@ public class RecipeRepositoryImpl implements IRecipeRepository {
     }
 
     @Override
+    public RecipeEntity updateRecipe(RecipeEntity recipeEntity) {
+
+        Optional<RecipeEntity> result = this.recipeRepository.findByRecipeId(recipeEntity.getRecipeId());
+
+        if (result.isEmpty()) {
+            return null;
+        }
+
+        RecipeEntity existingRecipe = result.get();
+        Long recipeId = existingRecipe.getId();
+        recipeEntity.setId(recipeId);
+
+        RecipeEntity recipe = this.recipeRepository.save(recipeEntity);
+
+        this.recipeIngredientRepository.deleteAllByRecipeId(recipeId);
+        this.recipeStepRepository.deleteAllByRecipeId(recipeId);
+
+        this.recipeIngredientRepository.saveAll(recipeEntity.getRecipeIngredients());
+        this.recipeStepRepository.saveAll(recipeEntity.getRecipeSteps());
+
+        return recipe;
+    }
+
+    @Override
     public RecipeEntity createRecipe(RecipeEntity recipeEntity) {
+
         RecipeEntity createdRecipe = this.recipeRepository.save(recipeEntity);
         this.recipeIngredientRepository.saveAll(createdRecipe.getRecipeIngredients());
         this.recipeStepRepository.saveAll(createdRecipe.getRecipeSteps());
