@@ -54,7 +54,7 @@ class TypedIdValueBaseTests {
 
     @Test
     void testEqualsMethod_ShouldHandleDifferentClass() {
-        assertNotEquals("String", id1, "An object should not be equal to a different class");
+        assertNotEquals(id1, "String", "An object should not be equal to a different class");
     }
 
     @Test
