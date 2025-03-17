@@ -32,4 +32,13 @@ public interface IRecipeRepository {
      * @return The newly created recipe
      */
     RecipeEntity createRecipe(RecipeEntity recipeEntity);
+
+    /**
+     * Deletes an existing recipe
+     *
+     * @param recipeId The ID of the recipe to be deleted
+     * @return True if the recipe was successfully deleted, false otherwise
+     */
+    boolean deleteRecipe(UUID recipeId);
+
 }

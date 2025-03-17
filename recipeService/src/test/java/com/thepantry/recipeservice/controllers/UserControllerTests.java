@@ -44,7 +44,6 @@ class UserControllerTests {
 
     @BeforeEach
     void setUp() {
-//        mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
         userId = UUID.randomUUID();
 
         UserRecipeDto recipe1 = new UserRecipeDto(UUID.randomUUID(), "Recipe 1", "Description 1", 30L, 10L, 40L, (short) 2);

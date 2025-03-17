@@ -104,7 +104,6 @@ class RecipeRepositoryImplTests {
 
     @Test
     void testGetRecipesCreatedByUserId_ShouldReturnRecipes_WhenRecipesExist() {
-        // Arrange
         UUID testUserId = UUID.randomUUID();
         RecipeEntity recipe1 = new RecipeEntity();
         recipe1.setRecipeId(UUID.randomUUID());
@@ -115,11 +114,8 @@ class RecipeRepositoryImplTests {
         Page<RecipeEntity> mockPage = new PageImpl<>(List.of(recipe1));
 
         when(recipeRepository.findAllByCreatedBy(testUserId, pageable)).thenReturn(mockPage);
-
-        // Act
         Page<RecipeEntity> result = recipeRepositoryImpl.getRecipesCreatedByUserId(testUserId, pageable);
 
-        // Assert
         assertEquals(1, result.getTotalElements());
         assertEquals(recipe1, result.getContent().getFirst());
 
@@ -127,20 +123,33 @@ class RecipeRepositoryImplTests {
     }
 
     @Test
-    void shouldCreateRecipeSuccessfully() {
-        // Given
+    void testCreateRecipe_ShouldCreateRecipe() {
+
         RecipeEntity recipeEntity = new RecipeEntity();
         recipeEntity.setName("Chocolate Cake");
 
         when(recipeRepository.save(recipeEntity)).thenReturn(recipeEntity);
-
-        // When
         RecipeEntity savedRecipe = recipeRepositoryImpl.createRecipe(recipeEntity);
 
-        // Then
         assertNotNull(savedRecipe);
         assertEquals("Chocolate Cake", savedRecipe.getName());
 
         verify(recipeRepository, times(1)).save(recipeEntity);
+    }
+
+    @Test
+    void testDeleteRecipe_ShouldDeleteRecipe_WhenRecipeExists() {
+        UUID recipeId = UUID.randomUUID();
+        when(recipeRepository.deleteByRecipeId(recipeId)).thenReturn(1);
+
+        assertTrue(recipeRepositoryImpl.deleteRecipe(recipeId));
+    }
+
+    @Test
+    void testDeleteRecipe_ShouldNotDeleteRecipe_WhenRecipeDoesNotExists() {
+        UUID recipeId = UUID.randomUUID();
+        when(recipeRepository.deleteByRecipeId(recipeId)).thenReturn(0);
+
+        assertFalse(recipeRepositoryImpl.deleteRecipe(recipeId));
     }
 }

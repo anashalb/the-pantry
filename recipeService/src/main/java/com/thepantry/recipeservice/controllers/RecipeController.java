@@ -3,6 +3,8 @@ package com.thepantry.recipeservice.controllers;
 import com.thepantry.recipeservice.application.recipes.createRecipe.CreateRecipeDto;
 import com.thepantry.recipeservice.application.recipes.createRecipe.CreateRecipeHandler;
 import com.thepantry.recipeservice.application.recipes.createRecipe.CreateRecipeRequest;
+import com.thepantry.recipeservice.application.recipes.deleteRecipe.DeleteRecipeHandler;
+import com.thepantry.recipeservice.application.recipes.deleteRecipe.DeleteRecipeRequest;
 import com.thepantry.recipeservice.application.recipes.getRecipeDetails.GetRecipeDto;
 import com.thepantry.recipeservice.application.recipes.getRecipeDetails.GetRecipeHandler;
 import com.thepantry.recipeservice.application.recipes.getRecipeDetails.RecipeDetailsDto;
@@ -21,10 +23,15 @@ public class RecipeController {
 
     private final GetRecipeHandler getRecipeHandler;
     private final CreateRecipeHandler createRecipeHandler;
+    private final DeleteRecipeHandler deleteRecipeHandler;
 
-    public RecipeController(GetRecipeHandler getRecipeHandler, CreateRecipeHandler createRecipeHandler) {
+    public RecipeController(
+            GetRecipeHandler getRecipeHandler,
+            CreateRecipeHandler createRecipeHandler,
+            DeleteRecipeHandler deleteRecipeHandler) {
         this.getRecipeHandler = getRecipeHandler;
         this.createRecipeHandler = createRecipeHandler;
+        this.deleteRecipeHandler = deleteRecipeHandler;
     }
 
     @GetMapping("/{recipeId}")
@@ -42,15 +49,28 @@ public class RecipeController {
     public ResponseEntity<?> createRecipe(@RequestBody CreateRecipeRequest createRecipeRequest) {
 
         //TODO: Map user to the recipe
-
-        SuccessResponse<RecipeDetailsDto> response;
-
         try {
             CreateRecipeDto recipe = this.createRecipeHandler.handle(createRecipeRequest);
             return ResponseEntity.ok(new SuccessResponse<>(recipe));
         } catch (BusinessRuleException e) {
             return ResponseEntity.unprocessableEntity().body(
                     new ErrorResponse("RECIPE_NOT_CREATED", e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/{recipeId}")
+    public ResponseEntity<?> deleteRecipe(@PathVariable UUID recipeId) {
+
+        //TODO: Check that user can delete the recipe
+        DeleteRecipeRequest deleteRecipeRequest = new DeleteRecipeRequest(recipeId);
+        boolean isDeleted = this.deleteRecipeHandler.handle(deleteRecipeRequest);
+        if (isDeleted) {
+            return ResponseEntity.noContent().build();
+        }
+        else {
+            return ResponseEntity.status(404).body(new ErrorResponse(
+                    "RECIPE_NOT_DELETED",
+                    "Recipe does not exist or could not be deleted"));
         }
     }
 }
