@@ -9,6 +9,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 public class Recipe extends DomainModel {
@@ -30,6 +31,12 @@ public class Recipe extends DomainModel {
         this.steps = new ArrayList<>();
     }
 
+    private Recipe(RecipeId recipeId) {
+        this.recipeId = recipeId;
+        this.ingredients = new ArrayList<>();
+        this.steps = new ArrayList<>();
+    }
+
     // Business Methods
     public static Recipe create(
             String name,
@@ -44,6 +51,54 @@ public class Recipe extends DomainModel {
     ) throws BusinessRuleException {
 
         Recipe recipe = new Recipe();
+        return initRecipe(
+                name,
+                description,
+                cookingTimeMinutes,
+                preparationTimeMinutes,
+                readyInTimeMinutes,
+                servings,
+                ingredients,
+                steps,
+                recipe);
+    }
+
+    public static Recipe update(
+            UUID recipeId,
+            String name,
+            String description,
+            Duration cookingTimeMinutes,
+            Duration preparationTimeMinutes,
+            Duration readyInTimeMinutes,
+            Short servings,
+            List<RecipeIngredient> ingredients,
+            List<RecipeStep> steps
+    ) throws BusinessRuleException {
+
+        Recipe recipe = new Recipe(new RecipeId(recipeId));
+        return initRecipe(
+                name,
+                description,
+                cookingTimeMinutes,
+                preparationTimeMinutes,
+                readyInTimeMinutes,
+                servings,
+                ingredients,
+                steps,
+                recipe);
+    }
+
+    private static Recipe initRecipe(
+            String name,
+            String description,
+            Duration cookingTimeMinutes,
+            Duration preparationTimeMinutes,
+            Duration readyInTimeMinutes,
+            Short servings,
+            List<RecipeIngredient> ingredients,
+            List<RecipeStep> steps,
+            Recipe recipe
+    ) throws BusinessRuleException {
         recipe.setName(name);
         recipe.setDescription(description);
         recipe.setCookingTimeMinutes(cookingTimeMinutes);

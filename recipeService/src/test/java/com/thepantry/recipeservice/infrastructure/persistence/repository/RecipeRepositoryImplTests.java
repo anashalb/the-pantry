@@ -1,12 +1,8 @@
-package com.thepantry.recipeservice.persistence.repository;
+package com.thepantry.recipeservice.infrastructure.persistence.repository;
 
 import com.thepantry.recipeservice.infrastructure.persistence.entities.RecipeEntity;
 import com.thepantry.recipeservice.infrastructure.persistence.entities.RecipeIngredientEntity;
 import com.thepantry.recipeservice.infrastructure.persistence.entities.RecipeStepEntity;
-import com.thepantry.recipeservice.infrastructure.persistence.repository.IRecipeCrudRepository;
-import com.thepantry.recipeservice.infrastructure.persistence.repository.IRecipeIngredientCrudRepository;
-import com.thepantry.recipeservice.infrastructure.persistence.repository.IRecipeStepCrudRepository;
-import com.thepantry.recipeservice.infrastructure.persistence.repository.RecipeRepositoryImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -151,5 +147,42 @@ class RecipeRepositoryImplTests {
         when(recipeRepository.deleteByRecipeId(recipeId)).thenReturn(0);
 
         assertFalse(recipeRepositoryImpl.deleteRecipe(recipeId));
+    }
+
+    @Test
+    void testUpdateRecipe_ShouldUpdateRecipe_WhenRecipeExists() {
+
+        when(recipeRepository.findByRecipeId(recipeId)).thenReturn(Optional.of(recipeEntity));
+        when(recipeRepository.save(recipeEntity)).thenReturn(recipeEntity);
+
+        Optional<RecipeEntity> result = recipeRepositoryImpl.updateRecipe(recipeEntity);
+
+        verify(recipeRepository, times(1)).save(recipeEntity);
+
+        verify(recipeIngredientRepository, times(1))
+                .deleteAllByRecipeId(recipeEntity.getId());
+
+        verify(recipeStepRepository, times(1))
+                .deleteAllByRecipeId(recipeEntity.getId());
+
+        verify(recipeIngredientRepository, times(1))
+                .saveAll(recipeEntity.getRecipeIngredients());
+
+        verify(recipeStepRepository, times(1))
+                .saveAll(recipeEntity.getRecipeSteps());
+
+        assertEquals(
+                recipeEntity.getRecipeId(),
+                result.get().getRecipeId(),
+                "Recipe ID should match");
+    }
+
+    @Test
+    void testUpdateRecipe_ShouldReturnEmpty_WhenRecipeDoesNotExist() {
+
+        when(recipeRepository.findByRecipeId(recipeId)).thenReturn(Optional.empty());
+        when(recipeRepository.save(recipeEntity)).thenReturn(recipeEntity);
+        Optional<RecipeEntity> result = recipeRepositoryImpl.updateRecipe(recipeEntity);
+        assertTrue(result.isEmpty(), "Should return empty when recipe is not found");
     }
 }

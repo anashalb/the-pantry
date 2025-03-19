@@ -1,6 +1,9 @@
-package com.thepantry.recipeservice.application.recipes.createRecipe;
+package com.thepantry.recipeservice.application.recipes.upsertRecipe;
 
+import com.thepantry.recipeservice.application.recipes.RecipeRequest;
 import com.thepantry.recipeservice.application.recipes.IRecipeRepository;
+import com.thepantry.recipeservice.application.recipes.RecipeIngredientRequest;
+import com.thepantry.recipeservice.application.recipes.RecipeStepRequest;
 import com.thepantry.recipeservice.domains.*;
 import com.thepantry.recipeservice.domains.common.BusinessRuleException;
 import com.thepantry.recipeservice.infrastructure.persistence.entities.RecipeEntity;
@@ -11,15 +14,16 @@ import org.springframework.stereotype.Component;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.IntStream;
 
 @Component
-public class CreateRecipeHandler {
+public class UpsertRecipeHandler {
 
     private final IRecipeRepository recipeRepository;
     private final IUnitConfiguration unitConfiguration;
 
-    public CreateRecipeHandler(
+    public UpsertRecipeHandler(
             IRecipeRepository recipeRepository,
             IUnitConfiguration unitConfiguration
     ) {
@@ -52,7 +56,6 @@ public class CreateRecipeHandler {
 
         recipeEntity.setRecipeIngredients(recipeIngredientEntities);
 
-
         List<RecipeStepEntity> recipeStepEntities = IntStream
                 .range(0, recipe.getSteps().size())
                 .mapToObj(i -> {
@@ -68,10 +71,11 @@ public class CreateRecipeHandler {
         return recipeEntity;
     }
 
-    public CreateRecipeDto handle(CreateRecipeRequest createRecipeRequest) throws BusinessRuleException {
+    public UpsertRecipeDto handle(RecipeRequest recipeRequest, UUID recipeId)
+            throws BusinessRuleException, RecipeCannotBeUpdatedException {
 
         List<RecipeIngredient> recipeIngredients = new ArrayList<>();
-        for (RecipeIngredientRequest ingredient : createRecipeRequest.ingredients()) {
+        for (RecipeIngredientRequest ingredient : recipeRequest.ingredients()) {
             recipeIngredients.add(
                     RecipeIngredient.of(new Ingredient(new IngredientId(ingredient.ingredientId())),
                             ingredient.preparationMethod(),
@@ -80,26 +84,45 @@ public class CreateRecipeHandler {
         }
 
         List<RecipeStep> recipeSteps = new ArrayList<>();
-        for (RecipeStepRequest step : createRecipeRequest.steps()) {
+        for (RecipeStepRequest step : recipeRequest.steps()) {
             recipeSteps.add(RecipeStep.of(step.instructions()));
         }
 
-        Recipe recipe = Recipe.create(
-                createRecipeRequest.name(),
-                createRecipeRequest.description(),
-                Duration.ofMinutes(createRecipeRequest.cookingTimeMinutes()),
-                Duration.ofMinutes(createRecipeRequest.preparationTimeMinutes()),
-                Duration.ofMinutes(createRecipeRequest.readyInTimeMinutes()),
-                createRecipeRequest.servings(),
-                recipeIngredients,
-                recipeSteps,
-                unitConfiguration
-        );
+        if (recipeId == null) {
+            Recipe recipe = Recipe.create(
+                    recipeRequest.name(),
+                    recipeRequest.description(),
+                    Duration.ofMinutes(recipeRequest.cookingTimeMinutes()),
+                    Duration.ofMinutes(recipeRequest.preparationTimeMinutes()),
+                    Duration.ofMinutes(recipeRequest.readyInTimeMinutes()),
+                    recipeRequest.servings(),
+                    recipeIngredients,
+                    recipeSteps,
+                    unitConfiguration
+            );
 
-        RecipeEntity recipeEntity = getRecipeEntity(recipe);
+            RecipeEntity recipeEntity = getRecipeEntity(recipe);
+            this.recipeRepository.createRecipe(recipeEntity);
+            return new UpsertRecipeDto(recipeEntity.getRecipeId());
 
-        this.recipeRepository.createRecipe(recipeEntity);
+        }
+        else {
+            Recipe recipe = Recipe.update(
+                    recipeId,
+                    recipeRequest.name(),
+                    recipeRequest.description(),
+                    Duration.ofMinutes(recipeRequest.cookingTimeMinutes()),
+                    Duration.ofMinutes(recipeRequest.preparationTimeMinutes()),
+                    Duration.ofMinutes(recipeRequest.readyInTimeMinutes()),
+                    recipeRequest.servings(),
+                    recipeIngredients,
+                    recipeSteps
+            );
 
-        return new CreateRecipeDto(recipeEntity.getRecipeId());
+            RecipeEntity recipeEntity = getRecipeEntity(recipe);
+            this.recipeRepository.updateRecipe(recipeEntity)
+                    .orElseThrow(() -> new RecipeCannotBeUpdatedException(recipeId));
+            return new UpsertRecipeDto(recipeEntity.getRecipeId());
+        }
     }
 }

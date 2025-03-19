@@ -1,6 +1,5 @@
-package com.thepantry.recipeservice.persistence;
+package com.thepantry.recipeservice.infrastructure.persistence;
 
-import com.thepantry.recipeservice.infrastructure.persistence.UnitConfiguration;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

@@ -38,7 +38,7 @@ public interface IRecipeRepository {
      * @param recipeEntity The details of the updated recipe
      * @return The updated recipe
      */
-    RecipeEntity updateRecipe(RecipeEntity recipeEntity);
+    Optional<RecipeEntity> updateRecipe(RecipeEntity recipeEntity);
 
     /**
      * Deletes an existing recipe
