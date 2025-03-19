@@ -12,7 +12,6 @@ public class GetRecipesCreatedByUserDto extends PageableDto {
 
     public GetRecipesCreatedByUserDto(UUID userId, int pageNumber, int pageSize, String sortBy) {
         super(pageNumber, pageSize, sortBy);
-        System.out.println(this.getPageNumber() + " " + this.getPageSize() + " " + this.getSortBy());
         this.userId = userId;
     }
 
