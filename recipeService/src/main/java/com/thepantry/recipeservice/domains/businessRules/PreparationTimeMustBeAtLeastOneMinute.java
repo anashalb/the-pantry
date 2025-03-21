@@ -17,7 +17,7 @@ public class PreparationTimeMustBeAtLeastOneMinute implements IBusinessRule {
     @Override
     public boolean isBroken() {
         return this.preparationTimeMinutes != null &&
-                this.preparationTimeMinutes.getSeconds() < MIN_PREPARATION_TIME_SECONDS;
+                this.preparationTimeMinutes.toSeconds() < MIN_PREPARATION_TIME_SECONDS;
     }
 
     @Override
