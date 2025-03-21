@@ -12,7 +12,8 @@ class RecipeServiceApplicationTests {
 
     @Test
     void contextLoads() {
-        assertDoesNotThrow(() -> RecipeServiceApplication.main(new String[]{}));
+        String[] args = { "--spring.profiles.active=test" };
+        assertDoesNotThrow(() -> RecipeServiceApplication.main(args));
     }
 
 }
