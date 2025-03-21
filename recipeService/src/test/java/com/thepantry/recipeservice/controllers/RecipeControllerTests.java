@@ -1,7 +1,10 @@
 package com.thepantry.recipeservice.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.thepantry.recipeservice.application.recipes.createRecipe.*;
+import com.thepantry.recipeservice.application.recipes.RecipeRequest;
+import com.thepantry.recipeservice.application.recipes.RecipeIngredientRequest;
+import com.thepantry.recipeservice.application.recipes.RecipeStepRequest;
+import com.thepantry.recipeservice.application.recipes.upsertRecipe.*;
 import com.thepantry.recipeservice.application.recipes.deleteRecipe.DeleteRecipeHandler;
 import com.thepantry.recipeservice.application.recipes.deleteRecipe.DeleteRecipeRequest;
 import com.thepantry.recipeservice.application.recipes.getRecipeDetails.GetRecipeDto;
@@ -27,6 +30,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -51,7 +55,7 @@ class RecipeControllerTests {
     private GetRecipeHandler getRecipeHandler;
 
     @MockitoBean
-    private CreateRecipeHandler createRecipeHandler;
+    private UpsertRecipeHandler upsertRecipeHandler;
 
     @MockitoBean
     private DeleteRecipeHandler deleteRecipeHandler;
@@ -104,7 +108,7 @@ class RecipeControllerTests {
     @Test
     void createRecipe_ShouldReturnSuccessResponse_WhenRecipeIsCreated() throws Exception {
 
-        CreateRecipeRequest createRecipeRequest = new CreateRecipeRequest(
+        RecipeRequest recipeRequest = new RecipeRequest(
                 "New Recipe",
                 "A delicious meal",
                 20L,
@@ -114,13 +118,13 @@ class RecipeControllerTests {
                 recipeIngredients,
                 recipeSteps);
 
-        CreateRecipeDto createdRecipe = new CreateRecipeDto(recipeId);
+        UpsertRecipeDto createdRecipe = new UpsertRecipeDto(recipeId);
 
-        when(createRecipeHandler.handle(any(CreateRecipeRequest.class))).thenReturn(createdRecipe);
+        when(upsertRecipeHandler.handle(any(RecipeRequest.class), eq(null))).thenReturn(createdRecipe);
 
         mockMvc.perform(post("/recipes")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(createRecipeRequest)))
+                        .content(objectMapper.writeValueAsString(recipeRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.recipe_id").value(recipeId.toString()));
     }
@@ -128,7 +132,7 @@ class RecipeControllerTests {
     @Test
     void createRecipe_ShouldReturnErrorResponse_WhenBusinessRuleExceptionIsThrown() throws Exception {
 
-        CreateRecipeRequest createRecipeRequest = new CreateRecipeRequest(
+        RecipeRequest recipeRequest = new RecipeRequest(
                 "Invalid Recipe",
                 "Should fail",
                 10L,
@@ -142,13 +146,93 @@ class RecipeControllerTests {
 
         BusinessRuleException exception = new BusinessRuleException(mockRule);
 
-        when(createRecipeHandler.handle(any(CreateRecipeRequest.class))).thenThrow(exception);
+        when(upsertRecipeHandler.handle(any(RecipeRequest.class), eq(null))).thenThrow(exception);
 
         mockMvc.perform(post("/recipes")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(createRecipeRequest)))
+                        .content(objectMapper.writeValueAsString(recipeRequest)))
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.error_code").value("RECIPE_NOT_CREATED"))
+                .andExpect(jsonPath("$.message").value(exception.getMessage()));
+    }
+
+    @Test
+    void updateRecipe_ShouldReturnSuccessResponse_WhenRecipeIsUpdated() throws Exception {
+
+        UUID recipeId = UUID.randomUUID();
+        RecipeRequest recipeRequest = new RecipeRequest(
+                "Existing Recipe",
+                "A delicious meal",
+                20L,
+                10L,
+                30L,
+                (short) 2,
+                recipeIngredients,
+                recipeSteps);
+
+        UpsertRecipeDto updatedRecipe = new UpsertRecipeDto(recipeId);
+
+        when(upsertRecipeHandler.handle(recipeRequest, recipeId)).thenReturn(updatedRecipe);
+
+        mockMvc.perform(put("/recipes/{recipeId}", recipeId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(recipeRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.recipe_id").value(recipeId.toString()));
+    }
+
+    @Test
+    void updateRecipe_ShouldReturnErrorResponse_WhenRecipeNotFound() throws Exception {
+
+        UUID recipeId = UUID.randomUUID();
+        RecipeRequest recipeRequest = new RecipeRequest(
+                "Non-existent Recipe",
+                "Will not be found",
+                20L,
+                10L,
+                30L,
+                (short) 2,
+                recipeIngredients,
+                recipeSteps);
+
+        RecipeCannotBeUpdatedException exception = new RecipeCannotBeUpdatedException(recipeId);
+
+        when(upsertRecipeHandler.handle(any(RecipeRequest.class), eq(recipeId)))
+                .thenThrow(exception);
+
+        mockMvc.perform(put("/recipes/{recipeId}", recipeId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(recipeRequest)))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.error_code").value("RECIPE_NOT_UPDATED"))
+                .andExpect(jsonPath("$.message").value(exception.getMessage()));
+    }
+
+    @Test
+    void updateRecipe_ShouldReturnErrorResponse_WhenBusinessRuleExceptionIsThrown() throws Exception {
+        UUID recipeId = UUID.randomUUID();
+        RecipeRequest recipeRequest = new RecipeRequest(
+                "Invalid recipe",
+                "Should fail",                20L,
+                10L,
+                30L,
+                (short) 2,
+                recipeIngredients,
+                recipeSteps);
+
+        IBusinessRule mockRule = mock(IBusinessRule.class);
+        when(mockRule.getMessage()).thenReturn("Recipe update rule violated");
+
+        BusinessRuleException exception = new BusinessRuleException(mockRule);
+
+        when(upsertRecipeHandler.handle(any(RecipeRequest.class), eq(recipeId)))
+                .thenThrow(exception);
+
+        mockMvc.perform(put("/recipes/{recipeId}", recipeId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(recipeRequest)))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.error_code").value("RECIPE_NOT_UPDATED"))
                 .andExpect(jsonPath("$.message").value(exception.getMessage()));
     }
 

@@ -1,4 +1,4 @@
-package com.thepantry.recipeservice.application.recipes.createRecipe;
+package com.thepantry.recipeservice.application.recipes;
 
 import java.util.UUID;
 

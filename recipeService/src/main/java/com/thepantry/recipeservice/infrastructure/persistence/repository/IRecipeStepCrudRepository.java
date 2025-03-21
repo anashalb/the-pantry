@@ -8,4 +8,6 @@ import java.util.List;
 public interface IRecipeStepCrudRepository extends CrudRepository<RecipeStepEntity, Long> {
 
     List<RecipeStepEntity> findAllByRecipeIdOrderByStepNumberAsc(Long id);
+
+    void deleteAllByRecipeId(Long recipeId);
 }

@@ -1,8 +1,9 @@
 package com.thepantry.recipeservice.controllers;
 
-import com.thepantry.recipeservice.application.recipes.createRecipe.CreateRecipeDto;
-import com.thepantry.recipeservice.application.recipes.createRecipe.CreateRecipeHandler;
-import com.thepantry.recipeservice.application.recipes.createRecipe.CreateRecipeRequest;
+import com.thepantry.recipeservice.application.recipes.upsertRecipe.UpsertRecipeDto;
+import com.thepantry.recipeservice.application.recipes.upsertRecipe.UpsertRecipeHandler;
+import com.thepantry.recipeservice.application.recipes.RecipeRequest;
+import com.thepantry.recipeservice.application.recipes.upsertRecipe.RecipeCannotBeUpdatedException;
 import com.thepantry.recipeservice.application.recipes.deleteRecipe.DeleteRecipeHandler;
 import com.thepantry.recipeservice.application.recipes.deleteRecipe.DeleteRecipeRequest;
 import com.thepantry.recipeservice.application.recipes.getRecipeDetails.GetRecipeDto;
@@ -22,15 +23,15 @@ import java.util.UUID;
 public class RecipeController {
 
     private final GetRecipeHandler getRecipeHandler;
-    private final CreateRecipeHandler createRecipeHandler;
+    private final UpsertRecipeHandler upsertRecipeHandler;
     private final DeleteRecipeHandler deleteRecipeHandler;
 
     public RecipeController(
             GetRecipeHandler getRecipeHandler,
-            CreateRecipeHandler createRecipeHandler,
+            UpsertRecipeHandler upsertRecipeHandler,
             DeleteRecipeHandler deleteRecipeHandler) {
         this.getRecipeHandler = getRecipeHandler;
-        this.createRecipeHandler = createRecipeHandler;
+        this.upsertRecipeHandler = upsertRecipeHandler;
         this.deleteRecipeHandler = deleteRecipeHandler;
     }
 
@@ -45,16 +46,31 @@ public class RecipeController {
         }
     }
 
-    @PostMapping("")
-    public ResponseEntity<?> createRecipe(@RequestBody CreateRecipeRequest createRecipeRequest) {
+    @PostMapping(value = "")
+    public ResponseEntity<?> createRecipe(@RequestBody RecipeRequest recipeRequest) {
 
         //TODO: Map user to the recipe
         try {
-            CreateRecipeDto recipe = this.createRecipeHandler.handle(createRecipeRequest);
+            UpsertRecipeDto recipe = this.upsertRecipeHandler.handle(recipeRequest, null);
             return ResponseEntity.ok(new SuccessResponse<>(recipe));
         } catch (BusinessRuleException e) {
             return ResponseEntity.unprocessableEntity().body(
                     new ErrorResponse("RECIPE_NOT_CREATED", e.getMessage()));
+        }
+    }
+
+    @PutMapping(value = "/{recipeId}")
+    public ResponseEntity<?> updateRecipe(
+            @RequestBody RecipeRequest recipeRequest,
+            @PathVariable UUID recipeId) {
+
+        //TODO: Map user to the recipe
+        try {
+            UpsertRecipeDto recipe = this.upsertRecipeHandler.handle(recipeRequest, recipeId);
+            return ResponseEntity.ok(new SuccessResponse<>(recipe));
+        } catch (BusinessRuleException | RecipeCannotBeUpdatedException e) {
+            return ResponseEntity.unprocessableEntity().body(
+                    new ErrorResponse("RECIPE_NOT_UPDATED", e.getMessage()));
         }
     }
 

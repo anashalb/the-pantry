@@ -16,6 +16,5 @@ public interface IRecipeCrudRepository extends CrudRepository<RecipeEntity, Long
 
     Page<RecipeEntity> findAllByCreatedBy(UUID createdBy, Pageable pageable);
 
-    @Transactional
     Integer deleteByRecipeId(UUID recipeId);
 }

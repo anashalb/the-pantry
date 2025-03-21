@@ -1,8 +1,8 @@
-package com.thepantry.recipeservice.application.recipes.createRecipe;
+package com.thepantry.recipeservice.application.recipes;
 
 import java.util.List;
 
-public record CreateRecipeRequest(
+public record RecipeRequest(
         String name,
         String description,
         Long readyInTimeMinutes,
