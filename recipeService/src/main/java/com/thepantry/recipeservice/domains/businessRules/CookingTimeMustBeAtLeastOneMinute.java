@@ -17,7 +17,7 @@ public class CookingTimeMustBeAtLeastOneMinute implements IBusinessRule {
     @Override
     public boolean isBroken() {
         return this.cookingTimeMinutes != null &&
-                this.cookingTimeMinutes.getSeconds() < MIN_COOKING_TIME_SECONDS;
+                this.cookingTimeMinutes.toSeconds() < MIN_COOKING_TIME_SECONDS;
     }
 
     @Override

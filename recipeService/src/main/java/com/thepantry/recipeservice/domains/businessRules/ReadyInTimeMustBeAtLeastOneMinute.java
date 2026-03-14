@@ -17,7 +17,7 @@ public class ReadyInTimeMustBeAtLeastOneMinute implements IBusinessRule {
     @Override
     public boolean isBroken() {
         return this.readyInTimeMinutes != null &&
-                this.readyInTimeMinutes.getSeconds() < MIN_READY_IN_TIME_SECONDS;
+                this.readyInTimeMinutes.toSeconds() < MIN_READY_IN_TIME_SECONDS;
     }
 
     @Override
