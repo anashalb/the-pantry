@@ -13,6 +13,7 @@ import com.thepantry.recipeservice.application.recipes.getRecipeDetails.RecipeNo
 import com.thepantry.recipeservice.controllers.dtos.responses.ErrorResponse;
 import com.thepantry.recipeservice.controllers.dtos.responses.SuccessResponse;
 import com.thepantry.recipeservice.domains.common.BusinessRuleException;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,6 +49,7 @@ public class RecipeController {
 
     @PostMapping(value = "")
     public ResponseEntity<?> createRecipe(@RequestBody RecipeRequest recipeRequest) {
+
 
         //TODO: Map user to the recipe
         try {
