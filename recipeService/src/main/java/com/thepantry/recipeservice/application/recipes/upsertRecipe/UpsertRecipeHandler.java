@@ -6,16 +6,12 @@ import com.thepantry.recipeservice.application.recipes.RecipeIngredientRequest;
 import com.thepantry.recipeservice.application.recipes.RecipeStepRequest;
 import com.thepantry.recipeservice.domains.*;
 import com.thepantry.recipeservice.domains.common.BusinessRuleException;
-import com.thepantry.recipeservice.infrastructure.persistence.entities.RecipeEntity;
-import com.thepantry.recipeservice.infrastructure.persistence.entities.RecipeIngredientEntity;
-import com.thepantry.recipeservice.infrastructure.persistence.entities.RecipeStepEntity;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.IntStream;
 
 @Component
 public class UpsertRecipeHandler {
@@ -29,46 +25,6 @@ public class UpsertRecipeHandler {
     ) {
         this.recipeRepository = recipeRepository;
         this.unitConfiguration = unitConfiguration;
-    }
-
-    private static RecipeEntity getRecipeEntity(Recipe recipe) {
-
-        RecipeEntity recipeEntity = new RecipeEntity();
-        recipeEntity.setRecipeId(recipe.getRecipeId().getValue());
-        recipeEntity.setName(recipe.getName());
-        recipeEntity.setDescription(recipe.getDescription());
-        recipeEntity.setCookingTimeMinutes(recipe.getCookingTimeMinutes().toMinutes());
-        recipeEntity.setPreparationTimeMinutes(recipe.getPreparationTimeMinutes().toMinutes());
-        recipeEntity.setReadyInTimeMinutes(recipe.getReadyInTimeMinutes().toMinutes());
-        recipeEntity.setServings(recipe.getServings());
-
-        List<RecipeIngredientEntity> recipeIngredientEntities = recipe.getIngredients().stream().map(
-                recipeIngredient -> {
-                    RecipeIngredientEntity entity = new RecipeIngredientEntity();
-                    entity.setIngredientId(recipeIngredient.getIngredient().getId().getValue());
-                    entity.setQuantity(recipeIngredient.getQuantity());
-                    entity.setPreparationMethod(recipeIngredient.getPreparationMethod());
-                    entity.setMeasurementUnit(recipeIngredient.getMeasurementUnit().getName());
-                    entity.setRecipe(recipeEntity);
-                    return entity;
-                }
-        ).toList();
-
-        recipeEntity.setRecipeIngredients(recipeIngredientEntities);
-
-        List<RecipeStepEntity> recipeStepEntities = IntStream
-                .range(0, recipe.getSteps().size())
-                .mapToObj(i -> {
-                    RecipeStep recipeStep = recipe.getSteps().get(i);
-                    RecipeStepEntity entity = new RecipeStepEntity();
-                    entity.setInstructions(recipeStep.getInstructions());
-                    entity.setStepNumber(i);
-                    entity.setRecipe(recipeEntity);
-                    return entity;
-                }).toList();
-
-        recipeEntity.setRecipeSteps(recipeStepEntities);
-        return recipeEntity;
     }
 
     public UpsertRecipeDto handle(RecipeRequest recipeRequest, UUID recipeId)
@@ -101,12 +57,9 @@ public class UpsertRecipeHandler {
                     unitConfiguration
             );
 
-            RecipeEntity recipeEntity = getRecipeEntity(recipe);
-            this.recipeRepository.createRecipe(recipeEntity);
-            return new UpsertRecipeDto(recipeEntity.getRecipeId());
-
-        }
-        else {
+            UUID id = this.recipeRepository.createRecipe(recipe);
+            return new UpsertRecipeDto(id);
+        } else {
             Recipe recipe = Recipe.update(
                     recipeId,
                     recipeRequest.name(),
@@ -119,10 +72,9 @@ public class UpsertRecipeHandler {
                     recipeSteps
             );
 
-            RecipeEntity recipeEntity = getRecipeEntity(recipe);
-            this.recipeRepository.updateRecipe(recipeEntity)
+            UUID id = this.recipeRepository.updateRecipe(recipe)
                     .orElseThrow(() -> new RecipeCannotBeUpdatedException(recipeId));
-            return new UpsertRecipeDto(recipeEntity.getRecipeId());
+            return new UpsertRecipeDto(id);
         }
     }
 }

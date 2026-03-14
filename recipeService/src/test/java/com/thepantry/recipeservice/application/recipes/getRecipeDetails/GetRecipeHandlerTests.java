@@ -1,10 +1,6 @@
 package com.thepantry.recipeservice.application.recipes.getRecipeDetails;
 
 import com.thepantry.recipeservice.application.recipes.IRecipeRepository;
-import com.thepantry.recipeservice.infrastructure.persistence.entities.MeasurementUnitEntity;
-import com.thepantry.recipeservice.infrastructure.persistence.entities.RecipeEntity;
-import com.thepantry.recipeservice.infrastructure.persistence.entities.RecipeIngredientEntity;
-import com.thepantry.recipeservice.infrastructure.persistence.entities.RecipeStepEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,7 +10,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -31,48 +26,29 @@ class GetRecipeHandlerTests {
 
     private UUID recipeId;
     private GetRecipeDto getRecipeDto;
-    private RecipeEntity recipeEntity;
+    private RecipeDetailsDto recipeDetailsDto;
 
     @BeforeEach
     void setUp() {
         recipeId = UUID.randomUUID();
         getRecipeDto = new GetRecipeDto(recipeId);
 
-        // Mock RecipeEntity
-        recipeEntity = new RecipeEntity();
-        recipeEntity.setRecipeId(recipeId);
-        recipeEntity.setName("Test Recipe");
-        recipeEntity.setDescription("Delicious test recipe");
-        recipeEntity.setCookingTimeMinutes(30L);
-        recipeEntity.setPreparationTimeMinutes(15L);
-        recipeEntity.setReadyInTimeMinutes(45L);
-        recipeEntity.setServings((short) 4);
-
-        // Mock Measurement Unit
-        MeasurementUnitEntity measurementUnit = new MeasurementUnitEntity();
-        measurementUnit.setName("cups");
-
-        // Mock Ingredients
-        RecipeIngredientEntity ingredient = new RecipeIngredientEntity();
-        ingredient.setId(new Random().nextLong());
-        ingredient.setQuantity(2.0);
-        ingredient.setMeasurementUnit(measurementUnit.getName());
-
-        List<RecipeIngredientEntity> recipeIngredients = List.of(ingredient);
-        recipeEntity.setRecipeIngredients(recipeIngredients);
-
-        // Mock Steps
-        RecipeStepEntity step = new RecipeStepEntity();
-        step.setStepNumber(1);
-        step.setInstructions("Mix all ingredients together.");
-
-        List<RecipeStepEntity> recipeSteps = List.of(step);
-        recipeEntity.setRecipeSteps(recipeSteps);
+        recipeDetailsDto = new RecipeDetailsDto(
+                recipeId,
+                "Test Recipe",
+                "Delicious test recipe",
+                30L,
+                15L,
+                45L,
+                (short) 4,
+                List.of(new RecipeIngredientDto(1L, null, 2.0, "cups")),
+                List.of(new RecipeStepDto(1, "Mix all ingredients together."))
+        );
     }
 
     @Test
     void handle_ShouldReturnRecipeDetailsDto_WhenRecipeExists() throws RecipeNotFoundException {
-        when(recipeRepository.getRecipeDetailsByRecipeId(recipeId)).thenReturn(Optional.of(recipeEntity));
+        when(recipeRepository.getRecipeDetailsByRecipeId(recipeId)).thenReturn(Optional.of(recipeDetailsDto));
 
         RecipeDetailsDto result = getRecipeHandler.handle(getRecipeDto);
 

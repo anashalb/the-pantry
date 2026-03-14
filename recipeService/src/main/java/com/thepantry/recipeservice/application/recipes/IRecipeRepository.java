@@ -1,6 +1,8 @@
 package com.thepantry.recipeservice.application.recipes;
 
-import com.thepantry.recipeservice.infrastructure.persistence.entities.RecipeEntity;
+import com.thepantry.recipeservice.application.recipes.getRecipeDetails.RecipeDetailsDto;
+import com.thepantry.recipeservice.application.recipes.getRecipesCreatedByUser.UserRecipeDto;
+import com.thepantry.recipeservice.domains.Recipe;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -15,37 +17,38 @@ public interface IRecipeRepository {
      * @param recipeId The unique identifier of the recipe to retrieve.
      * @return An {@code Optional} containing the recipe details if found, otherwise {@code Optional.empty()}.
      */
-    Optional<RecipeEntity> getRecipeDetailsByRecipeId(UUID recipeId);
+    Optional<RecipeDetailsDto> getRecipeDetailsByRecipeId(UUID recipeId);
 
     /**
-     * Retrieves a list of recipes created by the specified user.
+     * Retrieves a paginated list of recipes created by the specified user.
      *
-     * @param userId The unique identifier of the user whose recipes are to be retrieved.
-     * @return A list of {@code RecipeEntity} instances created by the user, or an empty list if none are found.
+     * @param userId      The unique identifier of the user whose recipes are to be retrieved.
+     * @param pageRequest The pagination and sorting parameters.
+     * @return A page of {@code UserRecipeDto} instances created by the user.
      */
-    Page<RecipeEntity> getRecipesCreatedByUserId(UUID userId, Pageable pageRequest);
+    Page<UserRecipeDto> getRecipesCreatedByUserId(UUID userId, Pageable pageRequest);
 
     /**
-     * Creates a new recipe
+     * Creates a new recipe.
      *
-     * @param recipeEntity The details of the recipe to be created
-     * @return The newly created recipe
+     * @param recipe The domain recipe to create.
+     * @return The UUID of the newly created recipe.
      */
-    RecipeEntity createRecipe(RecipeEntity recipeEntity);
+    UUID createRecipe(Recipe recipe);
 
     /**
-     * Updates a recipe
-     * @param recipeEntity The details of the updated recipe
-     * @return The updated recipe
-     */
-    Optional<RecipeEntity> updateRecipe(RecipeEntity recipeEntity);
-
-    /**
-     * Deletes an existing recipe
+     * Updates an existing recipe.
      *
-     * @param recipeId The ID of the recipe to be deleted
-     * @return True if the recipe was successfully deleted, false otherwise
+     * @param recipe The domain recipe with updated values.
+     * @return The UUID of the updated recipe, or {@code Optional.empty()} if not found.
+     */
+    Optional<UUID> updateRecipe(Recipe recipe);
+
+    /**
+     * Deletes an existing recipe.
+     *
+     * @param recipeId The ID of the recipe to be deleted.
+     * @return True if the recipe was successfully deleted, false otherwise.
      */
     boolean deleteRecipe(UUID recipeId);
-
 }
