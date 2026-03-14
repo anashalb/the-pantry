@@ -1,7 +1,6 @@
 package com.thepantry.recipeservice.application.recipes.getRecipesCreatedByUser;
 
 import com.thepantry.recipeservice.application.recipes.IRecipeRepository;
-import com.thepantry.recipeservice.infrastructure.persistence.entities.RecipeEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,21 +25,22 @@ class GetRecipesCreatedByUserHandlerTests {
     private IRecipeRepository recipeRepository;
 
     private UUID testUserId;
-    private RecipeEntity sampleRecipe;
+    private UserRecipeDto sampleRecipeDto;
     private GetRecipesCreatedByUserDto requestDto;
 
     @BeforeEach
     void setUp() {
         testUserId = UUID.randomUUID();
 
-        sampleRecipe = new RecipeEntity();
-        sampleRecipe.setRecipeId(UUID.randomUUID());
-        sampleRecipe.setName("Test Recipe");
-        sampleRecipe.setDescription("A test recipe description");
-        sampleRecipe.setCookingTimeMinutes(30L);
-        sampleRecipe.setPreparationTimeMinutes(15L);
-        sampleRecipe.setReadyInTimeMinutes(45L);
-        sampleRecipe.setServings((short) 4);
+        sampleRecipeDto = new UserRecipeDto(
+                UUID.randomUUID(),
+                "Test Recipe",
+                "A test recipe description",
+                30L,
+                15L,
+                45L,
+                (short) 4
+        );
 
         requestDto = new GetRecipesCreatedByUserDto(
                 testUserId,
@@ -54,7 +54,7 @@ class GetRecipesCreatedByUserHandlerTests {
     void testHandle() {
         Sort sort = Sort.by(Sort.Direction.DESC, requestDto.getSortBy());
         Pageable pageable = PageRequest.of(requestDto.getPageNumber(), requestDto.getPageSize(), sort);
-        Page<RecipeEntity> mockPage = new PageImpl<>(List.of(sampleRecipe), pageable, 1);
+        Page<UserRecipeDto> mockPage = new PageImpl<>(List.of(sampleRecipeDto), pageable, 1);
 
         when(recipeRepository.getRecipesCreatedByUserId(testUserId, pageable)).thenReturn(mockPage);
 
@@ -62,7 +62,7 @@ class GetRecipesCreatedByUserHandlerTests {
 
         assertEquals(1, result.getTotal());
         assertEquals(1, result.getCount());
-        assertEquals(sampleRecipe.getName(), result.getItems().getFirst().getName());
+        assertEquals(sampleRecipeDto.getName(), result.getItems().getFirst().getName());
 
         verify(recipeRepository, times(1)).getRecipesCreatedByUserId(testUserId, pageable);
     }

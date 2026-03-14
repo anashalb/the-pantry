@@ -5,9 +5,9 @@ import com.thepantry.recipeservice.application.recipes.IRecipeRepository;
 import com.thepantry.recipeservice.application.recipes.RecipeIngredientRequest;
 import com.thepantry.recipeservice.application.recipes.RecipeStepRequest;
 import com.thepantry.recipeservice.domains.IUnitConfiguration;
+import com.thepantry.recipeservice.domains.Recipe;
 import com.thepantry.recipeservice.domains.common.BusinessRuleException;
 import com.thepantry.recipeservice.infrastructure.persistence.UnitConfiguration;
-import com.thepantry.recipeservice.infrastructure.persistence.entities.RecipeEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,14 +30,11 @@ class UpsertRecipeHandlerTests {
     @Mock
     private IRecipeRepository recipeRepository;
     private RecipeRequest recipeRequest;
-    private RecipeEntity sampleRecipeEntity;
 
     @BeforeEach
     void setUp() {
-
         this.upsertRecipeHandler = new UpsertRecipeHandler(recipeRepository, unitConfiguration);
 
-        UUID recipeId = UUID.randomUUID();
         recipeRequest = new RecipeRequest(
                 "Test Recipe",
                 "This is a test description",
@@ -55,27 +52,19 @@ class UpsertRecipeHandlerTests {
                         "Boil for new minutes"
                 ))
         );
-
-        sampleRecipeEntity = new RecipeEntity();
-        sampleRecipeEntity.setRecipeId(recipeId);
-        sampleRecipeEntity.setName(recipeRequest.name());
-        sampleRecipeEntity.setDescription(recipeRequest.description());
-        sampleRecipeEntity.setCookingTimeMinutes(recipeRequest.cookingTimeMinutes());
-        sampleRecipeEntity.setPreparationTimeMinutes(recipeRequest.preparationTimeMinutes());
-        sampleRecipeEntity.setReadyInTimeMinutes(recipeRequest.readyInTimeMinutes());
-        sampleRecipeEntity.setServings(recipeRequest.servings());
     }
 
     @Test
     void testHandle_ShouldInvokeCreate_WhenRecipeIdIsNull() throws BusinessRuleException {
-        when(recipeRepository.createRecipe(any(RecipeEntity.class))).thenReturn(sampleRecipeEntity);
+        UUID expectedId = UUID.randomUUID();
+        when(recipeRepository.createRecipe(any(Recipe.class))).thenReturn(expectedId);
 
         UpsertRecipeDto result = upsertRecipeHandler.handle(recipeRequest, null);
 
         assertNotNull(result);
         assertNotNull(result.recipeId());
 
-        verify(recipeRepository, times(1)).createRecipe(any(RecipeEntity.class));
+        verify(recipeRepository, times(1)).createRecipe(any(Recipe.class));
     }
 
     @Test
@@ -100,29 +89,30 @@ class UpsertRecipeHandlerTests {
 
         assertThrows(BusinessRuleException.class, () -> upsertRecipeHandler.handle(invalidRequest, null));
 
-        verify(recipeRepository, never()).createRecipe(any(RecipeEntity.class));
+        verify(recipeRepository, never()).createRecipe(any(Recipe.class));
     }
 
     @Test
     void testHandle_ShouldUpdateRecipe_WhenRecipeIdIsNotNull() throws BusinessRuleException {
-        when(recipeRepository.updateRecipe(any(RecipeEntity.class))).thenReturn(Optional.of(sampleRecipeEntity));
+        UUID expectedId = UUID.randomUUID();
+        when(recipeRepository.updateRecipe(any(Recipe.class))).thenReturn(Optional.of(expectedId));
 
         UpsertRecipeDto result = upsertRecipeHandler.handle(recipeRequest, UUID.randomUUID());
 
         assertNotNull(result);
         assertNotNull(result.recipeId());
 
-        verify(recipeRepository, times(1)).updateRecipe(any(RecipeEntity.class));
+        verify(recipeRepository, times(1)).updateRecipe(any(Recipe.class));
     }
 
     @Test
     void testHandle_ShouldThrowException_WhenRecipeIdIsNotFound() throws BusinessRuleException {
-        when(recipeRepository.updateRecipe(any(RecipeEntity.class))).thenReturn(Optional.empty());
+        when(recipeRepository.updateRecipe(any(Recipe.class))).thenReturn(Optional.empty());
 
         assertThrows(
                 RecipeCannotBeUpdatedException.class,
                 () -> upsertRecipeHandler.handle(recipeRequest, UUID.randomUUID()));
 
-        verify(recipeRepository, times(1)).updateRecipe(any(RecipeEntity.class));
+        verify(recipeRepository, times(1)).updateRecipe(any(Recipe.class));
     }
 }
