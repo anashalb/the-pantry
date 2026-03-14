@@ -1,0 +1,20 @@
+spring:
+  config:
+    activate:
+      on-profile: docker
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+  datasource:
+    url: jdbc:postgresql://postgres:5432/recipes_service
+    username: anas
+    password: root
+    driver-class-name: org.postgresql.Driver
+  docker:
+    compose:
+      enabled: false
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+server:
+  port: 8080
