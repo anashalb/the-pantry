@@ -47,7 +47,7 @@ class UpsertRecipeHandlerTests {
                 (short) 4,
                 List.of(new RecipeIngredientRequest(
                         UUID.randomUUID(),
-                        10,
+                        10.0,
                         "kg",
                         "Grated"
                 )),
@@ -89,7 +89,7 @@ class UpsertRecipeHandlerTests {
                 (short) 4,
                 List.of(new RecipeIngredientRequest(
                         UUID.randomUUID(),
-                        10,
+                        10.0,
                         "kg",
                         "Grated"
                 )),

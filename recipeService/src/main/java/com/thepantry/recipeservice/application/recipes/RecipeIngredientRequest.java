@@ -4,7 +4,7 @@ import java.util.UUID;
 
 public record RecipeIngredientRequest(
         UUID ingredientId,
-        double quantity,
+        Double quantity,
         String measurementUnit,
         String preparationMethod
 ) {
